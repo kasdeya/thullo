@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String?
+  username String? @unique
+  email String? @unique
+  emailVerified DateTime?
+  profileImage String?
+  hashedPassword String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  boards Board[]
+  cards Card[]
+  comments Comment[]
+}
+
+model Board {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String 
+  public Boolean @default(true)
+  coverImage String?
+  team String[] @db.ObjectId
+  admins String[] @db.ObjectId 
+
+
+  userId String @db.ObjectId
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  lists List[]
+  cards Card[]
+}
+
+model List {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  cards Card[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  boardId String @db.ObjectId
+  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+}
+
+model Card {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String
+  cardMembers String[] @db.ObjectId
+  coverImage String?
+
+  userId String @db.ObjectId
+  listId String @db.ObjectId
+  boardId String @db.ObjectId
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  list List @relation(fields: [listId], references: [id], onDelete: Cascade)
+  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  labels Label[]
+  comments Comment[]
+  fileAttachments Attachment[]
+}
+
+model Label {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  body String
+  color String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cardId String @db.ObjectId
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+}
+
+model Attachment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  filename String
+  filetype String
+  size Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cardId String @db.ObjectId
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  body String
+  userId String @db.ObjectId
+  cardId String @db.ObjectId
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+}
