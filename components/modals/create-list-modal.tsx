@@ -26,26 +26,26 @@ import { Button } from '@/components/ui/button';
 import { useModal } from '@/hooks/use-modal-store';
 import axios from 'axios';
 import { FileUpload } from '../FileUpload';
+import { usePathname } from 'next/navigation';
 
 const formSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
-  imageUrl: z.string(),
-  isPublic: z.boolean(),
 });
 
-const CreateBoardModal = () => {
+const CreateListModal = () => {
   const { isOpen, onClose, type } = useModal();
+  const pathname = usePathname();
+  const path = pathname.split('/');
+  const boardId = path[2];
 
-  const isModalOpen = isOpen && type === 'createBoard';
+  const isModalOpen = isOpen && type === 'createList';
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      imageUrl: '',
-      isPublic: true,
     },
   });
 
@@ -53,7 +53,10 @@ const CreateBoardModal = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axios.post('/api/boards', values);
+      await axios.post(`/api/boards/${boardId}/addList`, {
+        ...values,
+        boardId,
+      });
 
       form.reset();
       onClose();
@@ -72,54 +75,18 @@ const CreateBoardModal = () => {
       <DialogContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="flex items-center justify-center text-center w-full">
-              <FormField
-                control={form.control}
-                name="imageUrl"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormControl>
-                      <FileUpload
-                        endpoint="boardImage"
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Title</FormLabel>
                   <FormControl>
                     <Input placeholder="Name your board" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This is the name of your board
+                    This is the title of your list
                   </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="isPublic"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Button
-                      variant={field.value ? 'secondary' : 'default'}
-                      onClick={() => field.onChange(!field.value)}
-                      type="button"
-                    >
-                      Private
-                    </Button>
-                  </FormControl>
-                  <FormDescription></FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -132,4 +99,4 @@ const CreateBoardModal = () => {
   );
 };
 
-export default CreateBoardModal;
+export default CreateListModal;

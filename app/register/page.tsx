@@ -24,7 +24,6 @@ const RegisterPage = () => {
       password: data.password,
     });
 
-    // console.log(userInfo);
     router.push('/login');
   };
 

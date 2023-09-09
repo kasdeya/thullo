@@ -1,6 +1,7 @@
 import prisma from '@/lib/prismadb';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
+import { number } from 'zod';
 
 export async function POST(req: Request) {
   const { name, imageUrl, isPublic } = await req.json();
@@ -31,6 +32,33 @@ export async function POST(req: Request) {
         title: name as string,
         coverImage: imageUrl as string,
         public: isPublic as boolean,
+      },
+      include: {
+        cards: true,
+        lists: true,
+      },
+    });
+
+    const numberOfLists = board.lists.length;
+
+    const boardId = board.id;
+    // Create the list and associated card using the boardId
+    await prisma.list.create({
+      data: {
+        index: 0,
+        name: 'initial',
+        board: {
+          connect: { id: boardId },
+        },
+        cards: {
+          create: {
+            name: 'initial card',
+            index: 0,
+            userId: profile.id,
+            description: 'description',
+            boardId,
+          },
+        },
       },
     });
 

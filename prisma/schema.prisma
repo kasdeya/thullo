@@ -55,12 +55,14 @@ model Board {
 
   lists List[]
   cards Card[]
+  labels Label[]
 }
 
 model List {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   cards Card[]
+  index Int @db.Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -75,6 +77,7 @@ model Card {
   description String
   cardMembers String[] @db.ObjectId
   coverImage String?
+  index Int @db.Int
 
   userId String @db.ObjectId
   listId String @db.ObjectId
@@ -102,6 +105,9 @@ model Label {
 
   cardId String @db.ObjectId
   card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  boardId String @db.ObjectId
+  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
 }
 
 model Attachment {

@@ -32,20 +32,24 @@ const formSchema = z.object({
     message: 'Name must be at least 2 characters.',
   }),
   imageUrl: z.string(),
-  isPublic: z.boolean(),
+  description: z.string(),
+  labels: z.array(z.string()),
+  members: z.array(z.string()),
 });
 
-const CreateBoardModal = () => {
-  const { isOpen, onClose, type } = useModal();
+const CreateCardModal = () => {
+  const { isOpen, onClose, type, listId, boardId, userId } = useModal();
 
-  const isModalOpen = isOpen && type === 'createBoard';
+  const isModalOpen = isOpen && type === 'createCard';
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       imageUrl: '',
-      isPublic: true,
+      description: '',
+      labels: [],
+      members: [],
     },
   });
 
@@ -53,7 +57,7 @@ const CreateBoardModal = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axios.post('/api/boards', values);
+      await axios.post(`/api/boards/${boardId}`, { ...values, listId });
 
       form.reset();
       onClose();
@@ -80,7 +84,7 @@ const CreateBoardModal = () => {
                   <FormItem className="w-full">
                     <FormControl>
                       <FileUpload
-                        endpoint="boardImage"
+                        endpoint="cardImage"
                         value={field.value}
                         onChange={field.onChange}
                       />
@@ -96,34 +100,33 @@ const CreateBoardModal = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Name your board" {...field} />
+                    <Input placeholder="Name your card" {...field} />
                   </FormControl>
                   <FormDescription>
-                    This is the name of your board
+                    This is the name of your card
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
-              name="isPublic"
+              name="description"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Button
-                      variant={field.value ? 'secondary' : 'default'}
-                      onClick={() => field.onChange(!field.value)}
-                      type="button"
-                    >
-                      Private
-                    </Button>
+                    <Input placeholder="Card description" {...field} />
                   </FormControl>
-                  <FormDescription></FormDescription>
+                  <FormDescription>
+                    This is the description of your board
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <Button type="submit">Create</Button>
           </form>
         </Form>
@@ -132,4 +135,4 @@ const CreateBoardModal = () => {
   );
 };
 
-export default CreateBoardModal;
+export default CreateCardModal;
