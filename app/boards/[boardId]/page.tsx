@@ -9,6 +9,10 @@ import prisma from '@/lib/prismadb';
 import BoardInside from '@/components/BoardInside';
 import AddBoardMember from '@/components/boards/AddBoardMember';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { XCircle } from 'lucide-react';
+import axios from 'axios';
+import MemberList from '@/components/boards/MemberList';
+import BoardMenu from '@/components/boards/BoardMenu';
 
 const BoardPage = async ({ params }: any) => {
   const board = await prisma.board.findFirst({
@@ -39,31 +43,12 @@ const BoardPage = async ({ params }: any) => {
     <div>
       <h1>board page</h1>
 
-      <div className="flex flex-row gap-2 bg-white/20 p-2">
-        <Avatar>
-          {board?.owner.profileImage ? (
-            <AvatarImage src={board.owner.profileImage} />
-          ) : (
-            <AvatarFallback>
-              {board?.owner.firstName?.charAt(0).toUpperCase()}
-              {board?.owner.lastName?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        {board?.members.map((member) => (
-          <Avatar key={member.id}>
-            {member.profileImage ? (
-              <AvatarImage src={member.profileImage} />
-            ) : (
-              <AvatarFallback>
-                {member.firstName?.charAt(0).toUpperCase()}
-                {member.lastName?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            )}
-          </Avatar>
-        ))}
-
-        <AddBoardMember board={board} />
+      <div className="flex flex-row justify-between bg-white/20 p-2">
+        <div className="flex flex-row gap-2">
+          <MemberList board={board} />
+          <AddBoardMember board={board} />
+        </div>
+        <BoardMenu board={board} />
       </div>
 
       <BoardInside board={board} />

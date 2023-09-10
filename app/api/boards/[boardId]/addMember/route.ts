@@ -9,6 +9,12 @@ export async function PATCH(req: Request) {
   try {
     const session = await getServerSession();
 
+    const ogBoard = await prisma.board.findFirst({
+      where: {
+        id: board.id,
+      },
+    });
+
     if (!session?.user?.email) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
@@ -20,6 +26,14 @@ export async function PATCH(req: Request) {
     // If we only adding one user
 
     if (selectedUsers.length === 1) {
+      const alreadyExists = ogBoard?.membersId.some(
+        (member: string) => member === selectedUsers[0]
+      );
+
+      if (alreadyExists) {
+        return new NextResponse('User already a member', { status: 401 });
+      }
+
       const updatedBoard = await prisma.board.update({
         where: {
           id: board.id,
@@ -38,11 +52,23 @@ export async function PATCH(req: Request) {
     // if it doesnt we just spread the new users were pushing
 
     if (selectedUsers.length > 1) {
-      const ogBoard = await prisma.board.findFirst({
-        where: {
-          id: board.id,
-        },
-      });
+      const hasCommonValues = (arr1: string[], arr2: string[]) => {
+        for (let i = 0; i < arr1.length; i++) {
+          if (arr1.includes(arr2[i])) {
+            return true; // Found a common value
+          }
+        }
+        return false; // No common values found
+      };
+
+      if (!ogBoard?.membersId) return;
+
+      const alreadyExists = hasCommonValues(ogBoard.membersId, selectedUsers);
+      console.log('already exists:', alreadyExists);
+
+      if (alreadyExists) {
+        return new NextResponse('User already a member', { status: 401 });
+      }
 
       if (ogBoard && ogBoard?.membersId.length > 0) {
         const updatedBoard = await prisma.board.update({

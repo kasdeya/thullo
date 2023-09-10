@@ -97,7 +97,7 @@ const AddBoardMember = ({ board }: BoardWithUsersAndListsWithCards) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button>
+        <Button className="ml-3">
           <Plus />
         </Button>
       </PopoverTrigger>
