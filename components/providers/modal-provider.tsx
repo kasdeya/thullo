@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import CreateBoardModal from '../modals/create-board-modal';
 import CreateCardModal from '../modals/create-card-modal';
 import CreateListModal from '../modals/create-list-modal';
+import CardModal from '../modals/card-modal';
 
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -21,6 +22,7 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
       <CreateBoardModal />
       <CreateCardModal />
       <CreateListModal />
+      <CardModal />
     </>
   );
 };

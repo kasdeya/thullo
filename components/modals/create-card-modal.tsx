@@ -38,7 +38,9 @@ const formSchema = z.object({
 });
 
 const CreateCardModal = () => {
-  const { isOpen, onClose, type, listId, boardId, userId } = useModal();
+  const { isOpen, onClose, type, data } = useModal();
+
+  const { listId, boardId, userId } = data;
 
   const isModalOpen = isOpen && type === 'createCard';
 

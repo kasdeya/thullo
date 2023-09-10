@@ -1,30 +1,32 @@
+import { Attachment, Card, User } from '@prisma/client';
 import { create } from 'zustand';
-export type ModalType = 'createBoard' | 'createCard' | 'createList';
+export type ModalType =
+  | 'createBoard'
+  | 'createCard'
+  | 'createList'
+  | 'cardModal';
 
-interface ModalData {}
+interface ModalData {
+  listId?: string;
+  boardId?: string;
+  userId?: string;
+  card?: Card | (Card & { fileAttachments: Attachment[] }) | null;
+  members?: User[] | null;
+  listName?: string;
+}
 
 interface ModalStore {
   type: ModalType | null;
+  data: ModalData;
   isOpen: boolean;
-  listId: string;
-  boardId: string;
-  userId: string;
-  onOpen: (
-    type: ModalType,
-    listId?: string,
-    boardId?: string,
-    userId?: string
-  ) => void;
+  onOpen: (type: ModalType, data?: ModalData) => void;
   onClose: () => void;
 }
 
 export const useModal = create<ModalStore>((set) => ({
   type: null,
+  data: {},
   isOpen: false,
-  listId: '',
-  boardId: '',
-  userId: '',
-  onOpen: (type, listId = '', boardId = '', userId = '') =>
-    set({ isOpen: true, type, listId, boardId, userId }),
+  onOpen: (type, data = {}) => set({ isOpen: true, type, data }),
   onClose: () => set({ type: null, isOpen: false }),
 }));

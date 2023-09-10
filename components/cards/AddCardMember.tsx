@@ -6,14 +6,14 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import prisma from '@/lib/prismadb';
 import { useEffect, useState } from 'react';
-import { Board, User } from '@prisma/client';
+import { Board, Card, User } from '@prisma/client';
 import { BoardWithUsersAndListsWithCards } from '@/types';
-import { getUsersNotInBoard } from '@/hooks/get-users-not-in-board';
 import { ScrollArea } from '../ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import axios from 'axios';
+import { getUsersNotInCard } from '@/hooks/get-users-not-in-card';
 
-const AddBoardMember = ({ board }: BoardWithUsersAndListsWithCards) => {
+const AddCardMember = (card: Card) => {
   const [members, setMembers] = useState<any>();
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -21,7 +21,7 @@ const AddBoardMember = ({ board }: BoardWithUsersAndListsWithCards) => {
 
   useEffect(() => {
     const fetchUsersNotInBoard = async () => {
-      const users = await getUsersNotInBoard({ board: board });
+      const users = await getUsersNotInCard(card);
 
       setMembers(users);
     };
@@ -29,7 +29,7 @@ const AddBoardMember = ({ board }: BoardWithUsersAndListsWithCards) => {
     if (!members) {
       fetchUsersNotInBoard();
     }
-  }, [board, members, selectedUsers]);
+  }, [card, members, selectedUsers]);
 
   const handleSearch = (e: any) => {
     const search = e.target.value.toLowerCase();
@@ -67,13 +67,13 @@ const AddBoardMember = ({ board }: BoardWithUsersAndListsWithCards) => {
   };
 
   const handleSubmit = async () => {
-    if (!board || selectedUsers.length === 0) {
+    if (!card || selectedUsers.length === 0) {
       return null;
     }
     try {
-      await axios.patch(`/api/boards/${board.id}/addMember`, {
+      await axios.patch(`/api/card/${card.id}/addMember`, {
         selectedUsers,
-        board,
+        card,
       });
     } catch (error) {
       console.log(error);
@@ -83,16 +83,16 @@ const AddBoardMember = ({ board }: BoardWithUsersAndListsWithCards) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="ml-3">
-          <Plus />
+        <Button className="w-full mt-4 flex justify-between">
+          Assign a member <Plus />
         </Button>
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex flex-col gap-2">
           <div className="space-y-2 flex flex-col gap-2">
-            <h4 className="font-medium leading-none">Invite to Board</h4>
+            <h4 className="font-medium leading-none">Members</h4>
             <p className="text-sm text-muted-foreground">
-              Search users you want to invite
+              Assign memebers to this card
             </p>
           </div>
           <div className="flex flex-col gap-2 items-center">
@@ -178,4 +178,4 @@ const AddBoardMember = ({ board }: BoardWithUsersAndListsWithCards) => {
   );
 };
 
-export default AddBoardMember;
+export default AddCardMember;

@@ -45,6 +45,7 @@ const Column = ({ id, name, cards, index, board }: any) => {
                               draggableProps={provided.draggableProps}
                               dragHandleProps={provided.dragHandleProps}
                               board={board}
+                              listName={name}
                             />
                           )}
                         </Draggable>
@@ -57,7 +58,9 @@ const Column = ({ id, name, cards, index, board }: any) => {
           </Droppable>
 
           <button
-            onClick={() => onOpen('createCard', id, board.id)}
+            onClick={() =>
+              onOpen('createCard', { listId: id, boardId: board.id })
+            }
             className="mt-5 p-2 flex justify-between bg-[#DAE4FD] text-[#2F80ED] rounded-md  w-full font-bold"
           >
             Add another card

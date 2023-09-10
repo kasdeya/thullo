@@ -35,7 +35,11 @@ const BoardPage = async ({ params }: any) => {
       },
       owner: true,
       labels: true,
-      cards: true,
+      cards: {
+        include: {
+          fileAttachments: true,
+        },
+      },
     },
   });
 

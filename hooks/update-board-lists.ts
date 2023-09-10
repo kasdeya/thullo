@@ -1,14 +1,16 @@
 'use server';
 import prisma from '@/lib/prismadb';
 import { Board, Card, List } from '@prisma/client';
-import { set } from 'zod';
+import { ObjectId } from 'mongodb';
 export const updateBoard = async ({
   listOne,
   listTwo,
   type,
   movedCard,
 }: any) => {
-  'use server';
+  console.log('list one: ', listOne, 'list two: ', listTwo);
+
+  ('use server');
   if (type === 'list') {
     await prisma.list.update({
       where: {
@@ -37,14 +39,22 @@ export const updateBoard = async ({
         },
       });
 
+      await prisma.card.findFirst({
+        where: {
+          id: listOne.id,
+        },
+      });
+
       const cardsOneWithoutId = listOne.cards.map((card: any) => {
         // Create a copy of the card object without the 'id' property
         const { id, ...cardWithoutId } = card;
         return cardWithoutId;
       });
 
+      const id = new ObjectId(movedCard.id);
+
       await prisma.card.createMany({
-        data: cardsOneWithoutId,
+        data: { id: id, ...cardsOneWithoutId[0] },
       });
     } else {
       await prisma.card.deleteMany({
@@ -60,8 +70,9 @@ export const updateBoard = async ({
           return cardWithoutId;
         });
 
+        const id = new ObjectId(movedCard.id);
         await prisma.card.createMany({
-          data: cardsOneWithoutId,
+          data: { id: id, ...cardsOneWithoutId[0] },
         });
       }
 
@@ -78,8 +89,11 @@ export const updateBoard = async ({
           return cardWithoutId;
         });
 
+        const test = { id: listTwo.id, ...cardsTwoWithoutId };
+        const id = new ObjectId(movedCard.id);
+
         await prisma.card.createMany({
-          data: cardsTwoWithoutId,
+          data: { id: id, ...cardsTwoWithoutId[0] },
         });
       }
     }

@@ -113,8 +113,8 @@ model Label {
 model Attachment {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   filename String
-  filetype String
-  size Int
+  filetype String?
+  size Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

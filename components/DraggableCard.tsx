@@ -17,6 +17,7 @@ import prisma from '@/lib/prismadb';
 import { getCardMembers } from '@/hooks/get-card-members';
 import { getCardOwner } from '@/hooks/get-card-owner';
 import { useEffect, useState } from 'react';
+import { useModal } from '@/hooks/use-modal-store';
 
 type Props = {
   card: any;
@@ -26,6 +27,7 @@ type Props = {
   draggableProps: DraggableProvidedDraggableProps;
   dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
   board: Board;
+  listName: string;
 };
 
 const DraggableCard = ({
@@ -36,9 +38,11 @@ const DraggableCard = ({
   draggableProps,
   dragHandleProps,
   board,
+  listName,
 }: Props) => {
   const [owner, setOwner] = useState<any>();
   const [members, setMembers] = useState<any>();
+  const { onOpen } = useModal();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -70,6 +74,7 @@ const DraggableCard = ({
       {...draggableProps}
       {...dragHandleProps}
       ref={innerRef}
+      onClick={() => onOpen('cardModal', { card, members, listName })}
     >
       <Card
         key={card.id}
