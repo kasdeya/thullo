@@ -7,8 +7,10 @@ export const updateBoard = async ({
   listTwo,
   type,
   movedCard,
+  startIndex,
+  finishIndex,
 }: any) => {
-  console.log('list one: ', listOne, 'list two: ', listTwo);
+  // console.log('list one: ', listOne, 'list two: ', listTwo);
 
   ('use server');
   if (type === 'list') {
@@ -32,68 +34,48 @@ export const updateBoard = async ({
   }
 
   if (type === 'card') {
+    console.log('indexes:', startIndex, finishIndex);
+    // id object for card probably wont need it
+    const id = new ObjectId(movedCard.id);
+    // If we dropping the card in same list(column)
+    // listOne = starting list = list from which we grabbed the card
+    // listTwo = ending list = list in which we dropped the card
     if (listTwo.id === listOne.id) {
-      await prisma.card.deleteMany({
-        where: {
-          listId: movedCard.listId,
-        },
-      });
-
-      await prisma.card.findFirst({
-        where: {
-          id: listOne.id,
-        },
-      });
-
-      const cardsOneWithoutId = listOne.cards.map((card: any) => {
-        // Create a copy of the card object without the 'id' property
-        const { id, ...cardWithoutId } = card;
-        return cardWithoutId;
-      });
-
-      const id = new ObjectId(movedCard.id);
-
-      await prisma.card.createMany({
-        data: { id: id, ...cardsOneWithoutId[0] },
-      });
-    } else {
-      await prisma.card.deleteMany({
-        where: {
-          listId: listOne.id,
-        },
-      });
-
-      if (!!listOne.cards[0]) {
-        const cardsOneWithoutId = listOne.cards.map((card: any) => {
-          // Create a copy of the card object without the 'id' property
-          const { id, ...cardWithoutId } = card;
-          return cardWithoutId;
+      // foor loop update all cards in list need to change each index + 1
+      // loop through either list, both should be same list
+      for (let index = finishIndex; index < listTwo.cards.length; index++) {
+        await prisma.card.update({
+          where: {
+            id: listTwo.cards[index].id,
+          },
+          data: {
+            index: listTwo.cards[index].index,
+            listId: listTwo.cards[index].listId,
+          },
         });
-
-        const id = new ObjectId(movedCard.id);
-        await prisma.card.createMany({
-          data: { id: id, ...cardsOneWithoutId[0] },
+      }
+    } else {
+      for (let index = startIndex; index < listOne.cards.length; index++) {
+        await prisma.card.update({
+          where: {
+            id: listOne.cards[index].id,
+          },
+          data: {
+            index: listOne.cards[index].index,
+            listId: listOne.cards[index].listId,
+          },
         });
       }
 
-      await prisma.card.deleteMany({
-        where: {
-          listId: listTwo.id,
-        },
-      });
-
-      if (!!listTwo.cards[0]) {
-        const cardsTwoWithoutId = listTwo.cards.map((card: any) => {
-          // Create a copy of the card object without the 'id' property
-          const { id, ...cardWithoutId } = card;
-          return cardWithoutId;
-        });
-
-        const test = { id: listTwo.id, ...cardsTwoWithoutId };
-        const id = new ObjectId(movedCard.id);
-
-        await prisma.card.createMany({
-          data: { id: id, ...cardsTwoWithoutId[0] },
+      for (let index = finishIndex; index < listTwo.cards.length; index++) {
+        await prisma.card.update({
+          where: {
+            id: listTwo.cards[index].id,
+          },
+          data: {
+            index: listTwo.cards[index].index,
+            listId: listTwo.cards[index].listId,
+          },
         });
       }
     }

@@ -75,6 +75,8 @@ const BoardInside = ({ board }: any) => {
       listTwo: board.lists[destination.droppableId],
       type: 'card',
       movedCard: board.lists[destination.droppableId].cards[destination.index],
+      startIndex: source.index,
+      finishIndex: destination.index,
     });
   };
 

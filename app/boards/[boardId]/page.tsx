@@ -30,6 +30,11 @@ const BoardPage = async ({ params }: any) => {
             orderBy: {
               index: 'asc',
             },
+            include: {
+              fileAttachments: true,
+              comments: true,
+              labels: true,
+            },
           },
         },
       },
