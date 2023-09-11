@@ -1,4 +1,4 @@
-import { Attachment, Card, User } from '@prisma/client';
+import { Attachment, Card, Prisma, User } from '@prisma/client';
 import { create } from 'zustand';
 export type ModalType =
   | 'createBoard'

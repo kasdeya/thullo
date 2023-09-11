@@ -97,17 +97,19 @@ const DraggableCard = ({
           <CardTitle>{card.name}</CardTitle>
         </CardContent>
         <CardFooter className="flex gap-2">
-          <Avatar>
-            {owner?.profileImage && (
-              <AvatarImage src={owner?.profileImage as string} />
-            )}
-            {card.userId && !owner?.profileImage && (
-              <AvatarFallback>
-                {owner?.firstName?.charAt(0).toUpperCase()}
-                {owner?.lastName?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            )}
-          </Avatar>
+          {members &&
+            members.map((member: User) => {
+              console.log(member);
+              return (
+                <Avatar key={member.id}>
+                  <AvatarImage src={member.profileImage as string} />
+                  <AvatarFallback>
+                    {member.firstName?.charAt(0).toUpperCase()}
+                    {member.lastName?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              );
+            })}
           {/* {members &&
             members.map((member: User, index: number) => {
               if (member && index < 3)

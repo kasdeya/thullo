@@ -10,8 +10,8 @@ import {
 import Image from 'next/image';
 import { useModal } from '@/hooks/use-modal-store';
 import { Label } from '../ui/label';
-import { Button } from '../ui/button';
-import { PencilIcon, Plus } from 'lucide-react';
+import { Button, buttonVariants } from '../ui/button';
+import { FileIcon, PencilIcon, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Textarea } from '../ui/textarea';
 import axios from 'axios';
@@ -20,6 +20,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { FileUploadButton } from '../UploadButton';
 import { Attachment, Card } from '@prisma/client';
 import { getCardAttachments } from '@/hooks/get-card-attachments';
+import { utapi } from 'uploadthing/server';
+import { cardFileDelete } from '@/hooks/card-file-delete';
+import { CustomUpload } from '../CustomUpload';
+
+const IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
+
 const CardModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const { card, members, listName } = data;
@@ -35,22 +41,31 @@ const CardModal = () => {
   useEffect(() => {
     if (!!card?.description) setDescription(card?.description);
 
-    const fetchAttachments = async () => {
-      try {
-        if (!card) return;
-        const fetchedAttachments = await getCardAttachments(card.id);
-        setAttachments(fetchedAttachments);
-        console.log('ran');
-      } catch (error) {
-        console.log(error);
-      }
-    };
+    // const fetchAttachments = async () => {
+    //   try {
+    //     if (!card) return;
+    //     const fetchedAttachments = await getCardAttachments(card.id);
+    //     setAttachments(fetchedAttachments);
+    //     console.log('ran');
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // };
 
-    fetchAttachments();
-    console.log(attachments);
+    // fetchAttachments();
+    // console.log(attachments);
   }, [card?.description, card, attachments]);
 
   const isModalOpen = isOpen && type === 'cardModal';
+
+  const handleAttachmentDelete = async (attachment: Attachment) => {
+    try {
+      // await utapi.deleteFiles(attachment.fileKey);
+      await cardFileDelete(attachment);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleCancelDescription = () => {
     setDescription(
@@ -115,9 +130,14 @@ const CardModal = () => {
                 </Label>
               </DialogTitle>
               <Label>Description</Label>{' '}
-              <Button onClick={() => setEditDescription(true)}>
-                <PencilIcon size={15} className="mr-2" />
-                Edit
+              <Button
+                className="!h-[24px] !w-[65px]"
+                onClick={() => setEditDescription(true)}
+              >
+                <p className="flex flex-row place-items-center gap-1">
+                  <PencilIcon size={15} />
+                  Edit
+                </p>
               </Button>
               <DialogDescription>
                 {!editDescription && description}
@@ -134,25 +154,75 @@ const CardModal = () => {
               )}
               {/* Attachments */}
               <div>
-                <div>
+                <div className="flex gap-2 place-items-center mt-2">
                   <Label>Attachments</Label>
-                  <Button>
+                  {/* <Button>
                     <Plus size={15} className="mr-2" /> Add
-                  </Button>
-                  <FileUploadButton
+                  </Button> */}
+                  <CustomUpload cardId={card.id} />
+                  {/* <FileUploadButton
                     endpoint="cardFile"
                     value={file ? file : ''}
                     onChange={(e) => setFile(e as string)}
                     cardId={card.id}
-                  />
+                  /> */}
                 </div>
-                {attachments &&
-                  attachments.map((attachment: any) => (
-                    <div key={attachment.id}>{attachment.filename}</div>
-                  ))}
+                {
+                  //@ts-ignore
+                  card.fileAttachments &&
+                    //@ts-ignore
+                    card.fileAttachments.map((attachment: Attachment) => (
+                      <div key={attachment.id} className="flex gap-2 my-4">
+                        {IMAGE_TYPES.some(
+                          (type) => type === attachment.filetype
+                        ) ? (
+                          <Image
+                            src={attachment.url as string}
+                            alt={'Attachment Preview'}
+                            fill
+                            className="!h-[50px] !w-[83px] !object-cover !relative rounded-lg"
+                          />
+                        ) : (
+                          <FileIcon className="!h-[50px] !w-[83px]" />
+                        )}
+                        <div className="flex flex-col">
+                          <Label className="text-[8px]">
+                            Added{' '}
+                            {attachment.createdAt.toLocaleDateString(
+                              undefined,
+                              {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                              }
+                            )}
+                          </Label>
+                          <p className="text-[10px]">{attachment.filename}</p>
+                          <div className="flex flex-row gap-2">
+                            <a
+                              className={`!h-[24px] ${buttonVariants({
+                                variant: 'default',
+                              })}`}
+                              href={attachment.url as string}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              Download
+                            </a>
+                            <Button
+                              className="!h-[24px]"
+                              onClick={() => handleAttachmentDelete(attachment)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                }
               </div>
-              {/* Comments */}
             </div>
+            {/* Comments */}
             <div className="">
               <div className="flex flex-col">
                 <Label>Actions</Label>
