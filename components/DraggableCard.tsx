@@ -18,15 +18,16 @@ import { getCardMembers } from '@/hooks/get-card-members';
 import { getCardOwner } from '@/hooks/get-card-owner';
 import { useEffect, useState } from 'react';
 import { useModal } from '@/hooks/use-modal-store';
+import { CardWithAttachments, CardWithAttachmentsAndMembers } from '@/types';
 
 type Props = {
-  card: any;
+  card: CardWithAttachmentsAndMembers;
   index: number;
   id: any;
   innerRef: (element: HTMLElement | null) => void;
   draggableProps: DraggableProvidedDraggableProps;
   dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
-  board: Board;
+  board: Board & { members: User[]; owner: User };
   listName: string;
 };
 
@@ -68,18 +69,25 @@ const DraggableCard = ({
     fetchUsers();
   }, [card.cardMembers, card.userId, card]);
 
+  const boardMembers = [...board.members, board.owner];
+
   return (
     <div
       className="rounded-md space-y-2 drop-shadow-md"
       {...draggableProps}
       {...dragHandleProps}
       ref={innerRef}
-      onClick={() => onOpen('cardModal', { card, members, listName })}
-    >
+      onClick={() =>
+        onOpen('cardModal', {
+          card,
+          members,
+          listName,
+          boardMembers,
+        })
+      }>
       <Card
         key={card.id}
-        className="cursor-pointer opacity-80 hover:opacity-100 transition"
-      >
+        className="cursor-pointer opacity-80 hover:opacity-100 transition">
         <CardHeader className="">
           {card.coverImage && (
             <div className="h-40">
@@ -99,7 +107,6 @@ const DraggableCard = ({
         <CardFooter className="flex gap-2">
           {members &&
             members.map((member: User) => {
-              console.log(member);
               return (
                 <Avatar key={member.id}>
                   <AvatarImage src={member.profileImage as string} />

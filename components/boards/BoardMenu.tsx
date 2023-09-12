@@ -50,6 +50,9 @@ const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
       console.log(error);
     }
   };
+
+  const createdAt = !board?.createdAt ? null : new Date(board.createdAt);
+
   return (
     <Sheet>
       <SheetTrigger className="flex flex-row gap-2 place-items-center">
@@ -75,11 +78,12 @@ const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
                     formatName(board.owner.firstName, board.owner.lastName)}
                 </p>
                 <p className=" text-xs">
-                  {board?.createdAt.toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+                  {createdAt &&
+                    createdAt.toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
                 </p>
               </div>
             </div>
@@ -88,8 +92,7 @@ const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
             <Label>Description</Label>
             <Button
               onClick={() => setIsEditing(true)}
-              className="flex gap-2 bg-transparent border-gray-500 border-2 text-gray-500 h-[30px]"
-            >
+              className="flex gap-2 bg-transparent border-gray-500 border-2 text-gray-500 h-[30px]">
               <Pencil size={15} />
               Edit
             </Button>
@@ -127,8 +130,7 @@ const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
             {board?.members.map((member) => (
               <div
                 className="flex flex-row place-items-center gap-2"
-                key={member.id}
-              >
+                key={member.id}>
                 <Avatar>
                   {member.profileImage ? (
                     <AvatarImage src={member.profileImage} />
@@ -147,8 +149,7 @@ const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
                   </p>
                   <Button
                     onClick={() => handleRemoveMember(member.id)}
-                    className="bg-transparent text-rose-600 border-rose-600 border"
-                  >
+                    className="bg-transparent text-rose-600 border-rose-600 border">
                     Remove
                   </Button>
                 </div>

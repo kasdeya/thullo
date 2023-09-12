@@ -11,123 +11,121 @@ datasource db {
 }
 
 model User {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  firstName String?
-  lastName String?
-  username String? @unique
-  email String? @unique
-  emailVerified DateTime?
-  profileImage String?
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName      String?
+  lastName       String?
+  username       String?   @unique
+  email          String?   @unique
+  emailVerified  DateTime?
+  profileImage   String?
   hashedPassword String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   boardsCreated Board[] @relation(name: "BoardOwner")
 
   boardsJoinedIds String[] @db.ObjectId
-  boardsJoined Board[] @relation(name: "TeamMembers", fields: [boardsJoinedIds], references: [id] )
+  boardsJoined    Board[]  @relation(name: "TeamMembers", fields: [boardsJoinedIds], references: [id])
 
-
-  cards Card[]
+  cards    Card[]    @relation(name: "CardsCreated")
   comments Comment[]
 
-
+  assignedCardsIds String[] @db.ObjectId
+  assignedCards    Card[]   @relation(name: "CardMember", fields: [assignedCardsIds], references: [id])
 }
 
 model Board {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  title String
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
   description String?
-  public Boolean @default(true)
-  coverImage String?
-
+  public      Boolean @default(true)
+  coverImage  String?
 
   membersId String[] @db.ObjectId
-  members User[] @relation(name: "TeamMembers" ,fields: [membersId], references: [id] )
-  
+  members   User[]   @relation(name: "TeamMembers", fields: [membersId], references: [id])
 
   userId String @db.ObjectId
-  owner User @relation(name:"BoardOwner", fields: [userId], references: [id], onDelete: Cascade)
+  owner  User   @relation(name: "BoardOwner", fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-
-  lists List[]
-  cards Card[]
+  lists  List[]
+  cards  Card[]
   labels Label[]
 }
 
 model List {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
   cards Card[]
-  index Int @db.Int
+  index Int    @db.Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   boardId String @db.ObjectId
-  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
 }
 
 model Card {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
   description String
   cardMembers String[] @db.ObjectId
-  coverImage String?
-  index Int @db.Int
+  coverImage  String?
+  index       Int      @db.Int
 
-  userId String @db.ObjectId
-  listId String @db.ObjectId
+  userId  String @db.ObjectId
+  listId  String @db.ObjectId
   boardId String @db.ObjectId
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  list List @relation(fields: [listId], references: [id], onDelete: Cascade)
+  user  User  @relation(name: "CardsCreated", fields: [userId], references: [id], onDelete: Cascade)
+  list  List  @relation(fields: [listId], references: [id], onDelete: Cascade)
   board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  labels Label[]
-  comments Comment[]
+  members         User[]       @relation(name: "CardMember", fields: [cardMembers], references: [id])
+  labels          Label[]
+  comments        Comment[]
   fileAttachments Attachment[]
 }
 
 model Label {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  body String
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  body  String
   color String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   cardId String @db.ObjectId
-  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   boardId String @db.ObjectId
-  board Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
 }
 
 model Attachment {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
   filename String
   filetype String?
-  size Int?
-  url String?
-  fileKey String
+  size     Int?
+  url      String?
+  fileKey  String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   cardId String @db.ObjectId
-  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  body String
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  body   String
   userId String @db.ObjectId
   cardId String @db.ObjectId
 

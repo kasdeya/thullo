@@ -1,10 +1,11 @@
 'use server';
 import { ObjectId } from 'mongodb';
+import prisma from '@/lib/prismadb';
 export const cardFileUpload = async (res: any, cardId: string) => {
   const extractedFileType = res?.[0].name.split('.').pop();
   console.log(res);
 
-  await prisma?.attachment.create({
+  const newAttachment = await prisma?.attachment.create({
     data: {
       filename: res?.[0].name,
       filetype: extractedFileType ? extractedFileType : '',
@@ -14,4 +15,6 @@ export const cardFileUpload = async (res: any, cardId: string) => {
       fileKey: res?.[0].fileKey,
     },
   });
+
+  return newAttachment;
 };

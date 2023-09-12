@@ -10,23 +10,35 @@ import { cardFileUpload } from '@/hooks/card-file-upload';
 import { Button, buttonVariants } from './ui/button';
 import { PlusIcon } from 'lucide-react';
 import { Label } from './ui/label';
+import useBoardStore from '@/hooks/use-board-store';
+import { Attachment } from '@prisma/client';
 
-export function CustomUpload({ cardId }: any) {
+export function CustomUpload({ cardId, listId }: any) {
   const [files, setFiles] = useState<File[]>([]);
+  const { updateCardAttachments } = useBoardStore();
+
   const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
     setFiles(acceptedFiles);
   }, []);
 
   const { startUpload, permittedFileInfo } = useUploadThing('cardFile', {
     onClientUploadComplete: async (res) => {
-      cardFileUpload(res, cardId);
-      console.log(res, cardId);
+      const prismaRes = await cardFileUpload(res, cardId);
+      // console.log(res, cardId);
+      console.log(prismaRes);
+      updateCardAttachments(listId, cardId, prismaRes);
+      setFile(null);
+      setUploading(false);
       //   alert('uploaded successfully!');
     },
     onUploadError: () => {
+      setUploadError(true);
+      setUploading(false);
+      setFile(null);
       //   alert('error occurred while uploading');
     },
     onUploadBegin: () => {
+      setUploading(true);
       //   alert('upload has begun');
     },
   });
@@ -40,13 +52,15 @@ export function CustomUpload({ cardId }: any) {
     accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
   });
 
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<File | null>();
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(false);
 
   return (
     // <div {...getRootProps()}>
     //   <input {...getInputProps()} />
     <div className="flex gap-2">
-      {!file && (
+      {!file && !uploading && (
         <div>
           <input
             type="file"
@@ -62,29 +76,40 @@ export function CustomUpload({ cardId }: any) {
               {
                 variant: 'default',
               }
-            )}`}
-          >
+            )}`}>
             <p className="flex items-center place-items-center">
-              <PlusIcon size={15} className="stroke-2" /> Add
+              <PlusIcon
+                size={15}
+                className="stroke-2"
+              />{' '}
+              Add
             </p>
           </Label>
         </div>
       )}
-      {file && (
+      {file && !uploading && (
         <div className="flex flex-row gap-2">
           <p>{file.name}</p>
           <Button
             className="cursor-pointer items-center flex !h-[24px] !w-[65px]"
-            onClick={() => startUpload(files)}
-          >
+            onClick={() => startUpload([file])}>
             Upload
           </Button>
           <Button
             className="cursor-pointer items-center flex !h-[24px] !w-[65px]"
-            onClick={() => setFile(undefined)}
-          >
+            onClick={() => setFile(undefined)}>
             Cancel
           </Button>
+        </div>
+      )}
+      {file && uploading && (
+        <div className="flex flex-row gap-2">
+          <p>Uploading {file.name}...</p>
+        </div>
+      )}
+      {!file && !uploading && uploadError && (
+        <div className="flex flex-row gap-2">
+          <p>Upload error.</p>
         </div>
       )}
     </div>

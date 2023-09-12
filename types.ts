@@ -1,6 +1,14 @@
 import { Server as NetServer, Socket } from 'net';
 import { NextApiResponse } from 'next';
-import { User, Board, List, Card, Label, Comment } from '@prisma/client';
+import {
+  User,
+  Board,
+  List,
+  Card,
+  Label,
+  Comment,
+  Attachment,
+} from '@prisma/client';
 
 export type BoardWithUsers = Board & {
   members: User[];
@@ -23,4 +31,10 @@ export type BoardWithUsersAndListsWithCards = {
         lists: (List & { cards: Card[] })[];
       })
     | null;
+};
+
+export type CardWithAttachments = Card & { fileAttachments: Attachment[] };
+export type CardWithAttachmentsAndMembers = Card & {
+  fileAttachments: Attachment[];
+  members: User[];
 };

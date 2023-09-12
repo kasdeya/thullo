@@ -5,31 +5,28 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import Image from 'next/image';
 import { useModal } from '@/hooks/use-modal-store';
 import { Label } from '../ui/label';
 import { Button, buttonVariants } from '../ui/button';
 import { FileIcon, PencilIcon, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Textarea } from '../ui/textarea';
 import axios from 'axios';
 import AddCardMember from '../cards/AddCardMember';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { FileUploadButton } from '../UploadButton';
-import { Attachment, Card } from '@prisma/client';
-import { getCardAttachments } from '@/hooks/get-card-attachments';
-import { utapi } from 'uploadthing/server';
+import { Attachment, Card, User } from '@prisma/client';
 import { cardFileDelete } from '@/hooks/card-file-delete';
 import { CustomUpload } from '../CustomUpload';
+import useBoardStore from '@/hooks/use-board-store';
+import { CardWithAttachmentsAndMembers } from '@/types';
 
 const IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
 
 const CardModal = () => {
   const { isOpen, onClose, type, data } = useModal();
-  const { card, members, listName } = data;
-  // const { card }: Card & { fileAttachments: Attachment[] } = data;
+  const { card, members, listName, boardMembers } = data;
   const [description, setDescription] = useState(
     !!card?.description ? card.description : ''
   );
@@ -37,24 +34,17 @@ const CardModal = () => {
   const [editDescription, setEditDescription] = useState(false);
   const [file, setFile] = useState('');
   const [attachments, setAttachments] = useState<Attachment[] | null>();
+  const { getCard, getCardMembers } = useBoardStore();
 
-  useEffect(() => {
-    if (!!card?.description) setDescription(card?.description);
+  if (!card) return;
+  const cardFromStore = getCard(card.listId, card.id);
 
-    // const fetchAttachments = async () => {
-    //   try {
-    //     if (!card) return;
-    //     const fetchedAttachments = await getCardAttachments(card.id);
-    //     setAttachments(fetchedAttachments);
-    //     console.log('ran');
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // };
+  const cardMembers = card ? getCardMembers(card.listId, card.id) : [];
 
-    // fetchAttachments();
-    // console.log(attachments);
-  }, [card?.description, card, attachments]);
+  // useEffect(() => {
+  //   if (!!card?.description) setDescription(card?.description);
+  //   console.log('card members changed', cardMembers);
+  // }, [card?.description, card, attachments, cardMembers]);
 
   const isModalOpen = isOpen && type === 'cardModal';
 
@@ -66,6 +56,7 @@ const CardModal = () => {
       console.log(error);
     }
   };
+  console.log('from store', cardMembers);
 
   const handleCancelDescription = () => {
     setDescription(
@@ -109,7 +100,9 @@ const CardModal = () => {
   };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={handleClose}>
+    <Dialog
+      open={isModalOpen}
+      onOpenChange={handleClose}>
       <DialogContent className=" max-w-3xl">
         <DialogHeader>
           {card?.coverImage && (
@@ -132,8 +125,7 @@ const CardModal = () => {
               <Label>Description</Label>{' '}
               <Button
                 className="!h-[24px] !w-[65px]"
-                onClick={() => setEditDescription(true)}
-              >
+                onClick={() => setEditDescription(true)}>
                 <p className="flex flex-row place-items-center gap-1">
                   <PencilIcon size={15} />
                   Edit
@@ -159,7 +151,10 @@ const CardModal = () => {
                   {/* <Button>
                     <Plus size={15} className="mr-2" /> Add
                   </Button> */}
-                  <CustomUpload cardId={card.id} />
+                  <CustomUpload
+                    cardId={card.id}
+                    listId={card.listId}
+                  />
                   {/* <FileUploadButton
                     endpoint="cardFile"
                     value={file ? file : ''}
@@ -167,62 +162,65 @@ const CardModal = () => {
                     cardId={card.id}
                   /> */}
                 </div>
-                {
-                  //@ts-ignore
-                  card.fileAttachments &&
-                    //@ts-ignore
-                    card.fileAttachments.map((attachment: Attachment) => (
-                      <div key={attachment.id} className="flex gap-2 my-4">
-                        {IMAGE_TYPES.some(
-                          (type) => type === attachment.filetype
-                        ) ? (
-                          <Image
-                            src={attachment.url as string}
-                            alt={'Attachment Preview'}
-                            fill
-                            className="!h-[50px] !w-[83px] !object-cover !relative rounded-lg"
-                          />
-                        ) : (
-                          <FileIcon className="!h-[50px] !w-[83px]" />
-                        )}
-                        <div className="flex flex-col">
-                          <Label className="text-[8px]">
-                            Added{' '}
-                            {attachment.createdAt.toLocaleDateString(
-                              undefined,
-                              {
+                {cardFromStore?.fileAttachments &&
+                  cardFromStore.fileAttachments.map(
+                    (attachment: Attachment) => {
+                      const createdAt = new Date(attachment.createdAt);
+                      return (
+                        <div
+                          key={attachment.id}
+                          className="flex gap-2 my-4">
+                          {IMAGE_TYPES.some(
+                            (type) => type === attachment.filetype
+                          ) ? (
+                            <Image
+                              src={attachment.url as string}
+                              alt={'Attachment Preview'}
+                              fill
+                              className="!h-[50px] !w-[83px] !object-cover !relative rounded-lg"
+                            />
+                          ) : (
+                            <FileIcon className="!h-[50px] !w-[83px]" />
+                          )}
+                          <div className="flex flex-col">
+                            <Label className="text-[8px]">
+                              Added{' '}
+                              {createdAt.toLocaleDateString(undefined, {
                                 year: 'numeric',
                                 month: 'long',
                                 day: 'numeric',
-                              }
-                            )}
-                          </Label>
-                          <p className="text-[10px]">{attachment.filename}</p>
-                          <div className="flex flex-row gap-2">
-                            <a
-                              className={`!h-[24px] ${buttonVariants({
-                                variant: 'default',
-                              })}`}
-                              href={attachment.url as string}
-                              target="_blank"
-                              rel="noreferrer noopener"
-                            >
-                              Download
-                            </a>
-                            <Button
-                              className="!h-[24px]"
-                              onClick={() => handleAttachmentDelete(attachment)}
-                            >
-                              Delete
-                            </Button>
+                              })}
+                            </Label>
+                            <p className="text-[10px]">{attachment.filename}</p>
+                            <div className="flex flex-row gap-2">
+                              <a
+                                className={`!h-[24px] ${buttonVariants({
+                                  variant: 'default',
+                                })}`}
+                                href={attachment.url as string}
+                                target="_blank"
+                                rel="noreferrer noopener">
+                                Download
+                              </a>
+                              <Button
+                                className="!h-[24px]"
+                                onClick={() =>
+                                  handleAttachmentDelete(attachment)
+                                }>
+                                Delete
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
-                }
+                      );
+                    }
+                  )}
+              </div>
+              <div>
+                {/* Comments */}
+                <Label>Comments</Label>
               </div>
             </div>
-            {/* Comments */}
             <div className="">
               <div className="flex flex-col">
                 <Label>Actions</Label>
@@ -230,32 +228,33 @@ const CardModal = () => {
                 <Button>Labels</Button>
               </div>
               <Label>Members</Label>
-              {/* Actions */}
-              {/* Members */}
-              {members &&
-                members.map((member) => (
-                  <div
-                    key={member.id}
-                    className="flex flex-row place-items-center gap-2"
-                  >
-                    <Avatar>
-                      <AvatarImage src={member?.profileImage as string} />
-                      <AvatarFallback>
-                        {member?.firstName?.charAt(0).toUpperCase()}
-                        {member?.lastName?.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="text-sm">
-                      <p>
-                        {member?.firstName &&
-                          member?.lastName &&
-                          formatName(member.firstName, member.lastName)}
-                      </p>
+              <>
+                {cardFromStore &&
+                  cardFromStore.members.map((member: User, index) => (
+                    <div
+                      key={member.id}
+                      className="flex flex-row place-items-center gap-2">
+                      <Avatar>
+                        <AvatarImage src={member?.profileImage as string} />
+                        <AvatarFallback>
+                          {member?.firstName?.charAt(0).toUpperCase()}
+                          {member?.lastName?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="text-sm">
+                        <p>
+                          {member?.firstName &&
+                            member?.lastName &&
+                            formatName(member.firstName, member.lastName)}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-
-              <AddCardMember {...card} />
+                  ))}
+              </>
+              <AddCardMember
+                card={card}
+                boardMembers={boardMembers}
+              />
             </div>
           </div>
         </DialogHeader>

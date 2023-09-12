@@ -2,6 +2,7 @@ import prisma from '@/lib/prismadb';
 import { data } from 'autoprefixer';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
+import { Board } from '@prisma/client';
 export async function PATCH(
   req: Request,
   { params }: { params: { boardId: string } }
@@ -74,6 +75,68 @@ export async function POST(
     });
 
     return NextResponse.json(newCard);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function GET(
+  req: Request,
+  { params }: { params: { boardId: string } }
+) {
+  function parseDatesInObject(obj: any) {
+    for (const key in obj) {
+      if (
+        obj.hasOwnProperty(key) &&
+        typeof obj[key] === 'string' &&
+        key.endsWith('At')
+      ) {
+        obj[key] = new Date(obj[key]);
+      }
+    }
+    return obj;
+  }
+
+  try {
+    const board = await prisma.board.findFirst({
+      where: {
+        id: params.boardId as string,
+      },
+      include: {
+        members: true,
+        lists: {
+          orderBy: {
+            index: 'asc',
+          },
+          include: {
+            cards: {
+              orderBy: {
+                index: 'asc',
+              },
+              include: {
+                fileAttachments: true,
+                comments: true,
+                labels: true,
+                members: true,
+              },
+            },
+          },
+        },
+        owner: true,
+        labels: true,
+        cards: {
+          include: {
+            fileAttachments: true,
+          },
+        },
+      },
+    });
+
+    const parsedDates = parseDatesInObject(board);
+    console.log('reg board:', board);
+    console.log('parsed dates:', parsedDates);
+
+    return NextResponse.json(parsedDates);
   } catch (error) {
     console.log(error);
   }

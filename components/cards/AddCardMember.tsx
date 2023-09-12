@@ -3,38 +3,43 @@ import { Plus } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import prisma from '@/lib/prismadb';
-import { useEffect, useState } from 'react';
-import { Board, Card, User } from '@prisma/client';
-import { BoardWithUsersAndListsWithCards } from '@/types';
+import { useState } from 'react';
+import { User } from '@prisma/client';
+import { CardWithAttachmentsAndMembers } from '@/types';
 import { ScrollArea } from '../ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import axios from 'axios';
-import { getUsersNotInCard } from '@/hooks/get-users-not-in-card';
+import useBoardStore from '@/hooks/use-board-store';
 
-const AddCardMember = (card: Card) => {
-  const [members, setMembers] = useState<any>();
+interface AddCardProps {
+  card: CardWithAttachmentsAndMembers;
+  boardMembers: User[] | null | undefined;
+}
+
+const AddCardMember = ({ card, boardMembers }: AddCardProps) => {
   const [search, setSearch] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<User[]>();
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const { board, updateCardMembers } = useBoardStore();
 
-  useEffect(() => {
-    const fetchUsersNotInBoard = async () => {
-      const users = await getUsersNotInCard(card);
+  const nonAddedMembers = () => {
+    const idsAlreadyAdded = card.members.map((user: User) => user.id);
+    const result = boardMembers?.filter(
+      (boardMember: User) => !idsAlreadyAdded.includes(boardMember.id)
+    );
+    return result;
+  };
 
-      setMembers(users);
-    };
-
-    if (!members) {
-      fetchUsersNotInBoard();
-    }
-  }, [card, members, selectedUsers]);
+  let test = nonAddedMembers();
 
   const handleSearch = (e: any) => {
+    if (!boardMembers) return;
+
     const search = e.target.value.toLowerCase();
     const searchArray = search.split(/\s+/).filter(Boolean);
-    const filteredMembers = members.filter((member: User) => {
+    const filteredMembers = boardMembers.filter((member: User) => {
       return searchArray.every(
         (term: string) =>
           member?.firstName?.toLowerCase().includes(term) ||
@@ -71,19 +76,32 @@ const AddCardMember = (card: Card) => {
       return null;
     }
     try {
-      await axios.patch(`/api/card/${card.id}/addMember`, {
+      const newCard = await axios.patch(`/api/card/${card.id}/addMember`, {
         selectedUsers,
         card,
       });
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsOpen(false);
+
+      const newMembers = (boardMembers as User[] | undefined)?.filter(
+        (member: User) => selectedUsers.includes(member.id)
+      );
+      if (!newMembers) return;
+      updateCardMembers(card.listId, card.id, newMembers);
+      setSelectedUsers([]);
     }
   };
 
   return (
-    <Popover>
+    <Popover
+      open={isOpen}
+      onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button className="w-full mt-4 flex justify-between">
+        <Button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full mt-4 flex justify-between">
           Assign a member <Plus />
         </Button>
       </PopoverTrigger>
@@ -108,16 +126,15 @@ const AddCardMember = (card: Card) => {
             <div className="gap-4 w-full">
               <ScrollArea className="w-full">
                 <ul className="">
-                  {search === '' && members ? (
-                    members.map((member: User) => {
+                  {search === '' ? (
+                    test?.map((member: User) => {
                       return (
                         <li
                           onClick={() => handleSelectUser(member)}
                           className={`flex flex-row gap-2 place-items-center p-2 hover:bg-white/10 cursor-pointer w-full ${
                             userSelected(member.id) ? 'bg-white/10' : ''
                           }`}
-                          key={member.id}
-                        >
+                          key={member.id}>
                           <Avatar>
                             {member.profileImage ? (
                               <AvatarImage src={member.profileImage} />
@@ -136,17 +153,16 @@ const AddCardMember = (card: Card) => {
                         </li>
                       );
                     })
-                  ) : searchResults.length === 0 ? (
+                  ) : searchResults?.length === 0 ? (
                     <li>No matching members found</li>
                   ) : (
-                    searchResults.map((member: User) => (
+                    searchResults?.map((member: User) => (
                       <li
                         onClick={() => handleSelectUser(member)}
                         className={`flex flex-row gap-2 place-items-center p-2 hover:bg-white/10 cursor-pointer ${
                           userSelected(member.id) ? 'bg-white/10' : ''
                         }`}
-                        key={member.id}
-                      >
+                        key={member.id}>
                         <Avatar>
                           {member.profileImage ? (
                             <AvatarImage src={member.profileImage} />

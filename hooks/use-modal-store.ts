@@ -1,3 +1,4 @@
+import { CardWithAttachments, CardWithAttachmentsAndMembers } from '@/types';
 import { Attachment, Card, Prisma, User } from '@prisma/client';
 import { create } from 'zustand';
 export type ModalType =
@@ -10,9 +11,10 @@ interface ModalData {
   listId?: string;
   boardId?: string;
   userId?: string;
-  card?: Card | (Card & { fileAttachments: Attachment[] }) | null;
+  card?: CardWithAttachmentsAndMembers | null;
   members?: User[] | null;
   listName?: string;
+  boardMembers?: User[];
 }
 
 interface ModalStore {
