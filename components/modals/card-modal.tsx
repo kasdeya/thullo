@@ -20,7 +20,11 @@ import { Attachment, Card, User } from '@prisma/client';
 import { cardFileDelete } from '@/hooks/card-file-delete';
 import { CustomUpload } from '../CustomUpload';
 import useBoardStore from '@/hooks/use-board-store';
-import { CardWithAttachmentsAndMembers } from '@/types';
+import { CardWithAttachmentsAndMembers, CommentWithUser } from '@/types';
+import Unsplash from '../Unsplash';
+import AddCardLabels from '../cards/AddCardLabels';
+import CommentArea from '../CommentArea';
+import Comment from '../Comment';
 
 const IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
 
@@ -56,7 +60,6 @@ const CardModal = () => {
       console.log(error);
     }
   };
-  console.log('from store', cardMembers);
 
   const handleCancelDescription = () => {
     setDescription(
@@ -82,13 +85,12 @@ const CardModal = () => {
         }
       );
       setResponseDescription(response.data.description);
+      setEditDescription(false);
     } catch (error) {
       console.log(error);
     } finally {
     }
   };
-
-  console.log(card);
 
   if (!card) return null;
 
@@ -103,18 +105,22 @@ const CardModal = () => {
     <Dialog
       open={isModalOpen}
       onOpenChange={handleClose}>
-      <DialogContent className=" max-w-3xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
-          {card?.coverImage && (
-            <Image
-              src={card?.coverImage as string}
-              alt="Card Cover Image"
-              width={100}
-              height={100}
-              className="!object-cover w-full h-[130px]"
-            />
-          )}
-          <div className="grid grid-cols-[_1fr,_0.5fr]">
+          <div className="h-[130px] relative">
+            {cardFromStore?.coverImage && (
+              <Image
+                src={cardFromStore?.coverImage as string}
+                alt="Card Cover Image"
+                // width={100}
+                fill
+                // height={100}
+                sizes="(max-width: 100%)"
+                className="!object-cover !w-full !h-[130px] !relative rounded-md"
+              />
+            )}
+          </div>
+          <div className="grid grid-cols-[_1fr,_0.3fr]">
             <div>
               <DialogTitle>
                 <p>{card?.name}</p>
@@ -132,7 +138,11 @@ const CardModal = () => {
                 </p>
               </Button>
               <DialogDescription>
-                {!editDescription && description}
+                {editDescription
+                  ? null
+                  : !editDescription && !responseDescription
+                  ? cardFromStore?.description
+                  : responseDescription}
               </DialogDescription>
               {editDescription && (
                 <>
@@ -169,7 +179,7 @@ const CardModal = () => {
                       return (
                         <div
                           key={attachment.id}
-                          className="flex gap-2 my-4">
+                          className="flex gap-2 my-4 relative">
                           {IMAGE_TYPES.some(
                             (type) => type === attachment.filetype
                           ) ? (
@@ -178,6 +188,7 @@ const CardModal = () => {
                               alt={'Attachment Preview'}
                               fill
                               className="!h-[50px] !w-[83px] !object-cover !relative rounded-lg"
+                              sizes="(width: 83px)"
                             />
                           ) : (
                             <FileIcon className="!h-[50px] !w-[83px]" />
@@ -218,19 +229,36 @@ const CardModal = () => {
               </div>
               <div>
                 {/* Comments */}
-                <Label>Comments</Label>
+                <CommentArea
+                  listId={card.listId}
+                  cardId={card.id}
+                />
+                {cardFromStore?.comments &&
+                  cardFromStore.comments.map((comment: any) => (
+                    <Comment
+                      comment={comment}
+                      key={comment.id}
+                    />
+                  ))}
               </div>
             </div>
             <div className="">
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-2">
                 <Label>Actions</Label>
-                <Button>Cover</Button>
-                <Button>Labels</Button>
+                <Unsplash
+                  cardId={card.id}
+                  listId={card.listId}
+                />
+                <AddCardLabels
+                  listId={card.listId}
+                  cardId={card.id}
+                  boardId={card.boardId}
+                />
               </div>
               <Label>Members</Label>
               <>
-                {cardFromStore &&
-                  cardFromStore.members.map((member: User, index) => (
+                {cardFromStore?.members &&
+                  cardFromStore?.members.map((member: User, index) => (
                     <div
                       key={member.id}
                       className="flex flex-row place-items-center gap-2">

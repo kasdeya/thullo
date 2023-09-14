@@ -83,13 +83,15 @@ const BoardInside = ({ board }: any) => {
   return (
     <>
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <Droppable droppableId="board" direction="horizontal" type="column">
+        <Droppable
+          droppableId="board"
+          direction="horizontal"
+          type="column">
           {(provided) => (
             <div
-              className="grid grid-cols-1 md:grid-cols-5 gap-5 max-w-7xl mx-auto"
+              className="grid grid-cols-1 md:grid-cols-5 gap-5 max-w-full mx-auto"
               {...provided.droppableProps}
-              ref={provided.innerRef}
-            >
+              ref={provided.innerRef}>
               {/* Rendering all the colums */}
               {/* {board?.lists && <Column />} */}
               {board.lists.map(
@@ -110,8 +112,7 @@ const BoardInside = ({ board }: any) => {
 
               <button
                 onClick={() => onOpen('createList')}
-                className="h-10 p-2 flex justify-between bg-[#DAE4FD] text-[#2F80ED] rounded-md  w-full font-bold"
-              >
+                className="h-10 p-2 flex justify-between bg-[#DAE4FD] text-[#2F80ED] rounded-md  w-full font-bold">
                 Add a list
                 <Plus />
               </button>

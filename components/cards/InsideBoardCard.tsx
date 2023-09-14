@@ -20,8 +20,7 @@ const InsideBoardCard = ({ board }: any) => {
     <Card
       key={board.id}
       className="w-[330px] cursor-pointer opacity-80 hover:opacity-100 transition"
-      onClick={() => router.push(`/boards/${board.id}`)}
-    >
+      onClick={() => router.push(`/boards/${board.id}`)}>
       <CardHeader className="">
         {board.coverImage ? (
           <div className="h-40">

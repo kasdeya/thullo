@@ -25,6 +25,10 @@ const AddCardMember = ({ card, boardMembers }: AddCardProps) => {
   const { board, updateCardMembers } = useBoardStore();
 
   const nonAddedMembers = () => {
+    if (!card.members) {
+      return boardMembers;
+    }
+
     const idsAlreadyAdded = card.members.map((user: User) => user.id);
     const result = boardMembers?.filter(
       (boardMember: User) => !idsAlreadyAdded.includes(boardMember.id)

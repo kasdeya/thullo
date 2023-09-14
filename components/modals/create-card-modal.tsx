@@ -26,6 +26,8 @@ import { Button } from '@/components/ui/button';
 import { useModal } from '@/hooks/use-modal-store';
 import axios from 'axios';
 import { FileUpload } from '../FileUpload';
+import useBoardStore from '@/hooks/use-board-store';
+import { Card } from '@prisma/client';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -38,6 +40,7 @@ const formSchema = z.object({
 });
 
 const CreateCardModal = () => {
+  const { addCard } = useBoardStore();
   const { isOpen, onClose, type, data } = useModal();
 
   const { listId, boardId, userId } = data;
@@ -59,8 +62,12 @@ const CreateCardModal = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axios.post(`/api/boards/${boardId}`, { ...values, listId });
+      const newCard = await axios.post(`/api/boards/${boardId}`, {
+        ...values,
+        listId,
+      });
 
+      addCard(listId as string, newCard.data);
       form.reset();
       onClose();
     } catch (error) {
@@ -74,10 +81,14 @@ const CreateCardModal = () => {
   };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={handleClose}>
+    <Dialog
+      open={isModalOpen}
+      onOpenChange={handleClose}>
       <DialogContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8">
             <div className="flex items-center justify-center text-center w-full">
               <FormField
                 control={form.control}
@@ -102,7 +113,10 @@ const CreateCardModal = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Name your card" {...field} />
+                    <Input
+                      placeholder="Name your card"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     This is the name of your card
@@ -119,7 +133,10 @@ const CreateCardModal = () => {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Card description" {...field} />
+                    <Input
+                      placeholder="Card description"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     This is the description of your board

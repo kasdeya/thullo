@@ -75,6 +75,7 @@ model Card {
   cardMembers String[] @db.ObjectId
   coverImage  String?
   index       Int      @db.Int
+  cardLabels  String[] @db.ObjectId
 
   userId  String @db.ObjectId
   listId  String @db.ObjectId
@@ -88,7 +89,7 @@ model Card {
   updatedAt DateTime @updatedAt
 
   members         User[]       @relation(name: "CardMember", fields: [cardMembers], references: [id])
-  labels          Label[]
+  labels          Label[]      @relation(name: "CardLabels", fields: [cardLabels], references: [id])
   comments        Comment[]
   fileAttachments Attachment[]
 }
@@ -101,8 +102,8 @@ model Label {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cardId String @db.ObjectId
-  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  cardsIds String[] @db.ObjectId
+  cards    Card[]   @relation(name: "CardLabels", fields: [cardsIds], references: [id])
 
   boardId String @db.ObjectId
   board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
@@ -124,10 +125,13 @@ model Attachment {
 }
 
 model Comment {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  body   String
-  userId String @db.ObjectId
-  cardId String @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  body      String
+  userId    String   @db.ObjectId
+  cardId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  editted   Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)

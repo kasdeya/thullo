@@ -115,7 +115,11 @@ export async function GET(
               },
               include: {
                 fileAttachments: true,
-                comments: true,
+                comments: {
+                  include: {
+                    user: true,
+                  },
+                },
                 labels: true,
                 members: true,
               },
@@ -126,6 +130,7 @@ export async function GET(
         labels: true,
         cards: {
           include: {
+            labels: true,
             fileAttachments: true,
           },
         },

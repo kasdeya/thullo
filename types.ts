@@ -38,3 +38,5 @@ export type CardWithAttachmentsAndMembers = Card & {
   fileAttachments: Attachment[];
   members: User[];
 };
+
+export type CommentWithUser = Comment & { user: User };

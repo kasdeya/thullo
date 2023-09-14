@@ -1,9 +1,10 @@
 import { Draggable, DraggableProvided, Droppable } from '@hello-pangea/dnd';
-import { Card } from '@prisma/client';
+import { Card, Label } from '@prisma/client';
 import DraggableCard from './DraggableCard';
 import { PlusIcon } from 'lucide-react';
 import { useModal } from '@/hooks/use-modal-store';
 import { CardWithAttachments, CardWithAttachmentsAndMembers } from '@/types';
+import useBoardStore from '@/hooks/use-board-store';
 
 const Column = ({ id, name, cards, index, board }: any) => {
   const { onOpen } = useModal();
@@ -32,7 +33,10 @@ const Column = ({ id, name, cards, index, board }: any) => {
                 {/* {provided.placeholder} */}
                 <div className="space-y-2 mt-2">
                   {cards.map(
-                    (card: CardWithAttachmentsAndMembers, index: number) => {
+                    (
+                      card: CardWithAttachmentsAndMembers & { labels: Label[] },
+                      index: number
+                    ) => {
                       if (card.listId === id)
                         return (
                           <Draggable
