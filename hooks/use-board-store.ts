@@ -57,6 +57,9 @@ interface BoardState {
   addCardLabel: (listId: string, cardId: string, label: Label) => void;
   addCard: (listId: string, card: Card) => void;
   addCardComment: (listId: string, cardId: string, comment: Comment) => void;
+  removeList: (listId: string) => void;
+  deleteCard: (listId: string, cardId: string) => void;
+  addList: (list: List) => void;
 }
 
 const useBoardStore = create<BoardState>((set) => ({
@@ -246,6 +249,51 @@ const useBoardStore = create<BoardState>((set) => ({
 
       updatedBoard.lists = updatedLists;
 
+      return { board: updatedBoard };
+    });
+  },
+  removeList: (listId: string) => {
+    set((state: any) => {
+      const updatedLists = [...state.board.lists];
+      const listIndex = updatedLists.findIndex((list) => list.id === listId);
+      updatedLists.splice(listIndex, 1);
+      const updatedBoard = { ...state.board };
+      updatedBoard.lists = updatedLists;
+      return { board: updatedBoard };
+    });
+  },
+  deleteCard: (listId: string, cardId: string) => {
+    set((state: any) => {
+      // Find the list by listId
+      const updatedLists = [...state.board.lists];
+      const listIndex = updatedLists.findIndex((list) => list.id === listId);
+      if (listIndex !== -1) {
+        // Find the card by cardId
+        const updatedCards = [...updatedLists[listIndex].cards];
+        const cardIndex = updatedCards.findIndex((card) => card.id === cardId);
+        if (cardIndex !== -1) {
+          // Delete the card inside the list
+          for (let i = cardIndex; i < updatedCards.length; i++) {
+            updatedCards[i].index--;
+          }
+          updatedCards.splice(cardIndex, 1);
+        }
+        // Update the card array within the list
+        updatedLists[listIndex].cards = updatedCards;
+      }
+      // Update the list array within the board
+      const updatedBoard = { ...state.board };
+
+      updatedBoard.lists = updatedLists;
+
+      return { board: updatedBoard };
+    });
+  },
+  addList: (list: List) => {
+    set((state: any) => {
+      const updatedLists = [...state.board.lists, list];
+      const updatedBoard = { ...state.board };
+      updatedBoard.lists = updatedLists;
       return { board: updatedBoard };
     });
   },

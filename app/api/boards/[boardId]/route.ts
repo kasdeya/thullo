@@ -61,7 +61,7 @@ export async function POST(
       data: {
         name: name as string,
         description: description as string,
-        index: numberOfCards ? numberOfCards + 1 : 0,
+        index: numberOfCards ? numberOfCards : 0,
         userId: user?.id,
         listId: listId as string,
         coverImage: imageUrl as string,

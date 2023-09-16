@@ -27,6 +27,7 @@ import { useModal } from '@/hooks/use-modal-store';
 import axios from 'axios';
 import { FileUpload } from '../FileUpload';
 import { usePathname } from 'next/navigation';
+import useBoardStore from '@/hooks/use-board-store';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -39,6 +40,7 @@ const CreateListModal = () => {
   const pathname = usePathname();
   const path = pathname.split('/');
   const boardId = path[2];
+  const { addList } = useBoardStore();
 
   const isModalOpen = isOpen && type === 'createList';
 
@@ -53,11 +55,12 @@ const CreateListModal = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axios.post(`/api/boards/${boardId}/addList`, {
+      const newList = await axios.post(`/api/boards/${boardId}/addList`, {
         ...values,
         boardId,
       });
 
+      addList(newList.data);
       form.reset();
       onClose();
     } catch (error) {
@@ -71,10 +74,14 @@ const CreateListModal = () => {
   };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={handleClose}>
+    <Dialog
+      open={isModalOpen}
+      onOpenChange={handleClose}>
       <DialogContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8">
             <FormField
               control={form.control}
               name="name"
@@ -82,7 +89,10 @@ const CreateListModal = () => {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Name your board" {...field} />
+                    <Input
+                      placeholder="Name your board"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     This is the title of your list

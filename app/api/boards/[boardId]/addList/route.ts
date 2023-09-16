@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const list = await prisma.list.create({
       data: {
         name: name,
-        index: numberOfLists ? numberOfLists - 1 : 0,
+        index: numberOfLists ? numberOfLists : 0,
         boardId: boardId,
       },
     });

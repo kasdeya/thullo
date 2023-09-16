@@ -26,6 +26,7 @@ import AddCardLabels from '../cards/AddCardLabels';
 import CommentArea from '../CommentArea';
 import Comment from '../Comment';
 import { useSession } from 'next-auth/react';
+import { cardDelete } from '@/hooks/card-delete';
 
 const IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
 
@@ -39,7 +40,7 @@ const CardModal = () => {
   const [editDescription, setEditDescription] = useState(false);
   const [file, setFile] = useState('');
   const [attachments, setAttachments] = useState<Attachment[] | null>();
-  const { getCard, getCardMembers } = useBoardStore();
+  const { getCard, getCardMembers, deleteCard } = useBoardStore();
   const { data: session, status } = useSession();
 
   if (!card) return;
@@ -103,6 +104,14 @@ const CardModal = () => {
     return fullName;
   };
 
+  const handleCardDelete = async () => {
+    //delete on db
+    const deletedCard = await cardDelete(card.id);
+    //delete on store
+    deleteCard(card.listId, card.id);
+    onClose();
+  };
+
   return (
     <Dialog
       open={isModalOpen}
@@ -122,7 +131,7 @@ const CardModal = () => {
               />
             )}
           </div>
-          <div className="grid grid-cols-[_1fr,_0.3fr]">
+          <div className="grid grid-cols-[_1fr,_0.3fr] gap-4">
             <div>
               <DialogTitle>
                 <p>{card?.name}</p>
@@ -236,7 +245,7 @@ const CardModal = () => {
                     }
                   )}
               </div>
-              <div>
+              <div className="flex flex-col gap-4">
                 {/* Comments */}
                 {session?.user?.email && (
                   <CommentArea
@@ -253,7 +262,7 @@ const CardModal = () => {
                   ))}
               </div>
             </div>
-            <div className="">
+            <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <Label>Actions</Label>
                 {session?.user?.email && (
@@ -300,6 +309,11 @@ const CardModal = () => {
                   boardMembers={boardMembers}
                 />
               )}
+              <Button
+                variant={'destructive'}
+                onClick={handleCardDelete}>
+                Delete
+              </Button>
             </div>
           </div>
         </DialogHeader>

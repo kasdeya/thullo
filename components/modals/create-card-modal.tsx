@@ -139,7 +139,7 @@ const CreateCardModal = () => {
                     />
                   </FormControl>
                   <FormDescription>
-                    This is the description of your board
+                    This is the description of your card
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
