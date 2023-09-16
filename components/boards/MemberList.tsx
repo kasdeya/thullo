@@ -5,7 +5,6 @@ import axios from 'axios';
 import { User } from '@prisma/client';
 const MemberList = ({ board }: any) => {
   const handleRemoveMember = async (userId: string) => {
-    console.log(userId);
     try {
       await axios.patch(`/api/boards/${board?.id}/removeMember`, {
         userId,
@@ -28,7 +27,9 @@ const MemberList = ({ board }: any) => {
         )}
       </Avatar>
       {board?.members.map((member: User) => (
-        <Avatar key={member.id} className=" overflow-visible">
+        <Avatar
+          key={member.id}
+          className=" overflow-visible">
           {member.profileImage ? (
             <AvatarImage src={member.profileImage} />
           ) : (

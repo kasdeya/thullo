@@ -3,7 +3,6 @@ import { ObjectId } from 'mongodb';
 import prisma from '@/lib/prismadb';
 export const cardFileUpload = async (res: any, cardId: string) => {
   const extractedFileType = res?.[0].name.split('.').pop();
-  console.log(res);
 
   const newAttachment = await prisma?.attachment.create({
     data: {

@@ -21,10 +21,14 @@ export default async function RootLayout({
   const session = await getServerSession();
   return (
     <html lang="en">
-      <body className={inter.className} suppressHydrationWarning>
+      <body
+        className={inter.className}
+        suppressHydrationWarning>
         <SessionProvider session={session}>
           <ModalProvider>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light">
               {children}
             </ThemeProvider>
           </ModalProvider>

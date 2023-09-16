@@ -7,9 +7,6 @@ export async function PATCH(
 ) {
   const { description } = await req.json();
   const session = await getServerSession();
-  console.log(params.cardId);
-  console.log(description);
-  console.log(session);
 
   if (!description) {
     return new NextResponse('No description provided', { status: 401 });

@@ -24,7 +24,6 @@ const Unsplash = ({ cardId, listId }: UnsplashProps) => {
   const handleSearch = async () => {
     try {
       const images = await fetchImages(search);
-      console.log('unsplash: ', images);
       setImages(images.results);
     } catch (error) {
       console.log(error);

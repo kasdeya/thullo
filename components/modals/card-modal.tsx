@@ -25,6 +25,7 @@ import Unsplash from '../Unsplash';
 import AddCardLabels from '../cards/AddCardLabels';
 import CommentArea from '../CommentArea';
 import Comment from '../Comment';
+import { useSession } from 'next-auth/react';
 
 const IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
 
@@ -39,6 +40,7 @@ const CardModal = () => {
   const [file, setFile] = useState('');
   const [attachments, setAttachments] = useState<Attachment[] | null>();
   const { getCard, getCardMembers } = useBoardStore();
+  const { data: session, status } = useSession();
 
   if (!card) return;
   const cardFromStore = getCard(card.listId, card.id);
@@ -105,7 +107,7 @@ const CardModal = () => {
     <Dialog
       open={isModalOpen}
       onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-h-full max-w-3xl">
         <DialogHeader>
           <div className="h-[130px] relative">
             {cardFromStore?.coverImage && (
@@ -129,14 +131,16 @@ const CardModal = () => {
                 </Label>
               </DialogTitle>
               <Label>Description</Label>{' '}
-              <Button
-                className="!h-[24px] !w-[65px]"
-                onClick={() => setEditDescription(true)}>
-                <p className="flex flex-row place-items-center gap-1">
-                  <PencilIcon size={15} />
-                  Edit
-                </p>
-              </Button>
+              {session?.user?.email && (
+                <Button
+                  className="!h-[24px] !w-[65px]"
+                  onClick={() => setEditDescription(true)}>
+                  <p className="flex flex-row place-items-center gap-1">
+                    <PencilIcon size={15} />
+                    Edit
+                  </p>
+                </Button>
+              )}
               <DialogDescription>
                 {editDescription
                   ? null
@@ -161,10 +165,12 @@ const CardModal = () => {
                   {/* <Button>
                     <Plus size={15} className="mr-2" /> Add
                   </Button> */}
-                  <CustomUpload
-                    cardId={card.id}
-                    listId={card.listId}
-                  />
+                  {session?.user?.email && (
+                    <CustomUpload
+                      cardId={card.id}
+                      listId={card.listId}
+                    />
+                  )}
                   {/* <FileUploadButton
                     endpoint="cardFile"
                     value={file ? file : ''}
@@ -203,24 +209,27 @@ const CardModal = () => {
                               })}
                             </Label>
                             <p className="text-[10px]">{attachment.filename}</p>
-                            <div className="flex flex-row gap-2">
-                              <a
-                                className={`!h-[24px] ${buttonVariants({
-                                  variant: 'default',
-                                })}`}
-                                href={attachment.url as string}
-                                target="_blank"
-                                rel="noreferrer noopener">
-                                Download
-                              </a>
-                              <Button
-                                className="!h-[24px]"
-                                onClick={() =>
-                                  handleAttachmentDelete(attachment)
-                                }>
-                                Delete
-                              </Button>
-                            </div>
+
+                            {session?.user?.email && (
+                              <div className="flex flex-row gap-2">
+                                <a
+                                  className={`!h-[24px] ${buttonVariants({
+                                    variant: 'default',
+                                  })}`}
+                                  href={attachment.url as string}
+                                  target="_blank"
+                                  rel="noreferrer noopener">
+                                  Download
+                                </a>
+                                <Button
+                                  className="!h-[24px]"
+                                  onClick={() =>
+                                    handleAttachmentDelete(attachment)
+                                  }>
+                                  Delete
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -229,10 +238,12 @@ const CardModal = () => {
               </div>
               <div>
                 {/* Comments */}
-                <CommentArea
-                  listId={card.listId}
-                  cardId={card.id}
-                />
+                {session?.user?.email && (
+                  <CommentArea
+                    listId={card.listId}
+                    cardId={card.id}
+                  />
+                )}
                 {cardFromStore?.comments &&
                   cardFromStore.comments.map((comment: any) => (
                     <Comment
@@ -245,15 +256,19 @@ const CardModal = () => {
             <div className="">
               <div className="flex flex-col gap-2">
                 <Label>Actions</Label>
-                <Unsplash
-                  cardId={card.id}
-                  listId={card.listId}
-                />
-                <AddCardLabels
-                  listId={card.listId}
-                  cardId={card.id}
-                  boardId={card.boardId}
-                />
+                {session?.user?.email && (
+                  <>
+                    <Unsplash
+                      cardId={card.id}
+                      listId={card.listId}
+                    />
+                    <AddCardLabels
+                      listId={card.listId}
+                      cardId={card.id}
+                      boardId={card.boardId}
+                    />
+                  </>
+                )}
               </div>
               <Label>Members</Label>
               <>
@@ -279,10 +294,12 @@ const CardModal = () => {
                     </div>
                   ))}
               </>
-              <AddCardMember
-                card={card}
-                boardMembers={boardMembers}
-              />
+              {session?.user?.email && (
+                <AddCardMember
+                  card={card}
+                  boardMembers={boardMembers}
+                />
+              )}
             </div>
           </div>
         </DialogHeader>

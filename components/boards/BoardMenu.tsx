@@ -14,6 +14,7 @@ import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Textarea } from '../ui/textarea';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import axios from 'axios';
 
 const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
@@ -21,6 +22,8 @@ const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
     board?.description ? board.description : ''
   );
   const [isEditing, setIsEditing] = useState(false);
+  const { data: session, status } = useSession();
+
   const formatName = (firstName: string, lastName: string) => {
     const first = firstName.charAt(0).toUpperCase() + firstName.slice(1);
     const second = lastName.charAt(0).toUpperCase() + lastName.slice(1);
@@ -40,7 +43,6 @@ const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
     }
   };
   const handleRemoveMember = async (userId: string) => {
-    console.log(userId);
     try {
       await axios.patch(`/api/boards/${board?.id}/removeMember`, {
         userId,
@@ -90,12 +92,14 @@ const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
           </div>
           <div className="flex flex-row place-items-center gap-2">
             <Label>Description</Label>
-            <Button
-              onClick={() => setIsEditing(true)}
-              className="flex gap-2 bg-transparent border-gray-500 border-2 text-gray-500 h-[30px]">
-              <Pencil size={15} />
-              Edit
-            </Button>
+            {session?.user?.email && (
+              <Button
+                onClick={() => setIsEditing(true)}
+                className="flex gap-2 bg-transparent border-gray-500 border-2 text-gray-500 h-[30px]">
+                <Pencil size={15} />
+                Edit
+              </Button>
+            )}
           </div>
           {!isEditing && <SheetDescription>{description}</SheetDescription>}
           {isEditing && (
@@ -147,11 +151,14 @@ const BoardMenu = ({ board }: BoardWithUsersAndListsWithCards) => {
                       member.lastName &&
                       formatName(member.firstName, member.lastName)}
                   </p>
-                  <Button
-                    onClick={() => handleRemoveMember(member.id)}
-                    className="bg-transparent text-rose-600 border-rose-600 border">
-                    Remove
-                  </Button>
+
+                  {session?.user?.email && (
+                    <Button
+                      onClick={() => handleRemoveMember(member.id)}
+                      className="bg-transparent text-rose-600 border-rose-600 border">
+                      Remove
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}

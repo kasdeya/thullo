@@ -4,7 +4,6 @@ import prisma from '@/lib/prismadb';
 
 export async function PATCH(req: Request) {
   const { selectedUsers, board } = await req.json();
-  console.log(selectedUsers, board);
 
   try {
     const session = await getServerSession();
@@ -64,7 +63,6 @@ export async function PATCH(req: Request) {
       if (!ogBoard?.membersId) return;
 
       const alreadyExists = hasCommonValues(ogBoard.membersId, selectedUsers);
-      console.log('already exists:', alreadyExists);
 
       if (alreadyExists) {
         return new NextResponse('User already a member', { status: 401 });

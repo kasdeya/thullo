@@ -4,8 +4,6 @@ import prisma from '@/lib/prismadb';
 
 export async function PATCH(req: Request) {
   const { userId, board } = await req.json();
-  //   console.log(selectedUser, board);
-  console.log('selected user id:', userId, 'board :', board);
 
   try {
     const session = await getServerSession();
@@ -29,8 +27,6 @@ export async function PATCH(req: Request) {
     );
     if (index) {
       const membersWithRemovedUser = ogBoard?.membersId.splice(index, 1);
-      console.log(index);
-      console.log(board.membersId);
 
       if (membersWithRemovedUser && ogBoard) {
         await prisma.board.update({

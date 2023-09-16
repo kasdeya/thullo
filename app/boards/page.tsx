@@ -1,20 +1,26 @@
 import { BoardList } from '@/components/boards/BoardList';
-import { Button } from '@/components/ui/button';
-import { useModal } from '@/hooks/use-modal-store';
-import axios from 'axios';
-import { ButtonForMember } from '@/components/test';
 import { AddBoard } from '@/components/boards/AddBoard';
+import Header from '@/components/Header';
+import { getServerSession } from 'next-auth';
 
 const Boards = async () => {
   // const { onOpen } = useModal();
+  const session = await getServerSession();
+
   return (
-    <div>
+    <>
       {/* BOARDS */}
       {/* ADD BOARD FORM */}
-      <AddBoard />
-      <BoardList />
+      <Header />
+      <div className=" flex flex-col m-auto">
+        <div className="flex flex-row place-items-center justify-between py-5 px-10">
+          <p>All boards</p>
+          {session?.user?.email && <AddBoard />}
+        </div>
+        <BoardList />
+      </div>
       {/* <ButtonForMember></ButtonForMember> */}
-    </div>
+    </>
   );
 };
 

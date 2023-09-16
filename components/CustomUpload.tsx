@@ -24,8 +24,6 @@ export function CustomUpload({ cardId, listId }: any) {
   const { startUpload, permittedFileInfo } = useUploadThing('cardFile', {
     onClientUploadComplete: async (res) => {
       const prismaRes = await cardFileUpload(res, cardId);
-      // console.log(res, cardId);
-      console.log(prismaRes);
       updateCardAttachments(listId, cardId, prismaRes);
       setFile(null);
       setUploading(false);

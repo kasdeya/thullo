@@ -9,7 +9,6 @@ export async function PATCH(
 ) {
   try {
     const { userId } = await req.json();
-    console.log(userId);
 
     const updatedBoard = await prisma.board.update({
       where: {
@@ -21,8 +20,6 @@ export async function PATCH(
         },
       },
     });
-
-    console.log(updatedBoard);
 
     return NextResponse.json(updatedBoard);
   } catch (error) {
@@ -44,8 +41,6 @@ export async function POST(
   try {
     const { name, description, imageUrl, labels, members, listId } =
       await req.json();
-
-    console.log('route test', listId);
 
     const cardsInList = await prisma.list.findFirst({
       where: {
@@ -138,9 +133,6 @@ export async function GET(
     });
 
     const parsedDates = parseDatesInObject(board);
-    console.log('reg board:', board);
-    console.log('parsed dates:', parsedDates);
-
     return NextResponse.json(parsedDates);
   } catch (error) {
     console.log(error);

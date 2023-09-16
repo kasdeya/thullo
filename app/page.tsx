@@ -1,11 +1,19 @@
+'use client';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+const LoginPage = () => {
+  const router = useRouter();
 
-export default function Home() {
-  return (
-    <main>
-      <h1>auth test</h1>
-      <Link href="/register">Register Page</Link>
-      <Link href="/login">Login Page</Link>
-    </main>
-  );
-}
+  useEffect(() => {
+    // Redirect to '/boards' when the component mounts
+    router.push('/boards');
+  }, [router]);
+};
+
+export default LoginPage;
