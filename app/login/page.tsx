@@ -1,7 +1,12 @@
 'use client';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 const LoginPage = () => {
   const router = useRouter();
   const [data, setData] = useState({
@@ -12,32 +17,35 @@ const LoginPage = () => {
   const loginUser = async (e: any) => {
     e.preventDefault();
     signIn('credentials', { ...data, redirect: false });
-    router.push('/dashboard');
+    router.push('/boards');
   };
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img
+        <Image
           className="mx-auto h-10 w-auto"
-          src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-          alt="Your Company"
+          src="/images/Logo.svg"
+          width={300}
+          height={300}
+          alt="Thullo"
         />
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight ">
           Sign in to your account
         </h2>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" onSubmit={loginUser}>
+        <form
+          className="space-y-6"
+          onSubmit={loginUser}>
           <div>
-            <label
+            <Label
               htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
+              className="block text-sm font-medium leading-6 ">
               Email address
-            </label>
+            </Label>
             <div className="mt-2">
-              <input
+              <Input
                 id="email"
                 name="email"
                 type="email"
@@ -45,30 +53,28 @@ const LoginPage = () => {
                 required
                 value={data.email}
                 onChange={(e) => setData({ ...data, email: e.target.value })}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="w-full rounded-md py-1.5"
               />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between">
-              <label
+              <Label
                 htmlFor="password"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
+                className="block text-sm font-medium leading-6 ">
                 Password
-              </label>
+              </Label>
               <div className="text-sm">
-                <a
+                <Link
                   href="#"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500"
-                >
+                  className="font-semibold text-indigo-600 hover:text-indigo-500">
                   Forgot password?
-                </a>
+                </Link>
               </div>
             </div>
             <div className="mt-2">
-              <input
+              <Input
                 id="password"
                 name="password"
                 type="password"
@@ -76,29 +82,27 @@ const LoginPage = () => {
                 required
                 value={data.password}
                 onChange={(e) => setData({ ...data, password: e.target.value })}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="w-full rounded-md py-1.5"
               />
             </div>
           </div>
 
           <div>
-            <button
+            <Button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               Sign in
-            </button>
+            </Button>
           </div>
         </form>
 
-        <p className="mt-10 text-center text-sm text-gray-500">
+        <p className="mt-10 text-center text-sm">
           Not a member?{' '}
-          <a
-            href="#"
-            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-          >
-            Start a 14 day free trial
-          </a>
+          <Link
+            href="/register"
+            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+            Register
+          </Link>
         </p>
       </div>
     </div>

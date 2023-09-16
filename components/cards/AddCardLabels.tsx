@@ -58,7 +58,6 @@ const AddCardLabels = ({ cardId, listId, boardId }: AddCardLabelsProps) => {
     addCardLabel(listId, cardId, labelFromPrisma);
     addBoardLabel(boardId, labelFromPrisma);
     setIsOpen(false);
-    console.log('from label:', board);
   };
 
   const addExistingLabel = async (label: Label) => {

@@ -19,7 +19,7 @@ const BoardCard = ({ board }: any) => {
   return (
     <Card
       key={board.id}
-      className="w-[330px] cursor-pointer opacity-80 hover:opacity-100 transition"
+      className="w-auto cursor-pointer opacity-80 hover:opacity-100 transition"
       onClick={() => router.push(`/boards/${board.id}`)}>
       <CardHeader className="">
         {board.coverImage ? (

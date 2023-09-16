@@ -15,8 +15,6 @@ const Comment = ({ comment }: any) => {
   const [responseComment, setResponseComment] = useState('');
   const [editted, setEditted] = useState(false);
 
-  console.log(comment);
-
   const date = new Date(comment.createdAt);
 
   const formatName = (firstName: string, lastName: string) => {

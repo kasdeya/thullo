@@ -5,9 +5,11 @@ import { PlusIcon } from 'lucide-react';
 import { useModal } from '@/hooks/use-modal-store';
 import { CardWithAttachments, CardWithAttachmentsAndMembers } from '@/types';
 import useBoardStore from '@/hooks/use-board-store';
+import { useSession } from 'next-auth/react';
 
 const Column = ({ id, name, cards, index, board }: any) => {
   const { onOpen } = useModal();
+  const { data: session } = useSession();
 
   return (
     <Draggable
@@ -65,14 +67,16 @@ const Column = ({ id, name, cards, index, board }: any) => {
             )}
           </Droppable>
 
-          <button
-            onClick={() =>
-              onOpen('createCard', { listId: id, boardId: board.id })
-            }
-            className="mt-5 p-2 flex justify-between bg-[#DAE4FD] text-[#2F80ED] rounded-md  w-full font-bold">
-            Add another card
-            <PlusIcon />
-          </button>
+          {session?.user?.email && (
+            <button
+              onClick={() =>
+                onOpen('createCard', { listId: id, boardId: board.id })
+              }
+              className="mt-5 p-2 flex justify-between bg-[#DAE4FD] text-[#2F80ED] rounded-md  w-full font-bold">
+              Add another card
+              <PlusIcon />
+            </button>
+          )}
         </div>
       )}
     </Draggable>

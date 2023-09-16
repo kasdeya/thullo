@@ -11,9 +11,7 @@ export const getCardAttachments = async (cardId: string) => {
     },
   });
 
-  console.log(card);
   const fileAttachments = card?.fileAttachments;
-  console.log('files:', fileAttachments);
 
   if (card?.fileAttachments) {
     return fileAttachments;

@@ -11,15 +11,11 @@ export async function POST(req: Request) {
     return new NextResponse('Unauthorized', { status: 401 });
   }
 
-  console.log(session);
   const profile = await prisma.user.findFirst({
     where: {
       email: session?.user?.email,
     },
   });
-  console.log(profile);
-
-  console.log(name, imageUrl, isPublic);
 
   try {
     if (!profile) {

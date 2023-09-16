@@ -23,6 +23,7 @@ import useBoardStore from '@/hooks/use-board-store';
 import { PlusIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import LabelBadge from './LabelBadge';
+import { useSession } from 'next-auth/react';
 
 type Props = {
   card: CardWithAttachmentsAndMembers & { labels: Label[] };
@@ -49,6 +50,8 @@ const DraggableCard = ({
   const [members, setMembers] = useState<any>();
   const { onOpen } = useModal();
   const { getCard, getCardMembers } = useBoardStore();
+
+  const { data: session, status } = useSession();
 
   const cardFromStore = getCard(
     card.listId,
@@ -114,12 +117,14 @@ const DraggableCard = ({
                 // }
               })}
 
-            <Button className="p-2 bg-blue-500">
-              <PlusIcon
-                className="stroke-2"
-                size={20}
-              />
-            </Button>
+            {session?.user?.email && (
+              <Button className="p-2 bg-blue-500">
+                <PlusIcon
+                  className="stroke-2"
+                  size={20}
+                />
+              </Button>
+            )}
           </div>
           {/* {members &&
             members.map((member: User, index: number) => {

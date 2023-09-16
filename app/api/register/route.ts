@@ -5,7 +5,6 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const { firstName, lastName, username, email, password } = await req.json();
-    console.log(firstName, lastName, username, email, password);
 
     if (!username || !email || !password) {
       return new NextResponse('Missing name, email, or password', {
@@ -34,8 +33,6 @@ export async function POST(req: Request) {
         hashedPassword: hashedPassword,
       },
     });
-
-    console.log(user);
 
     return NextResponse.json(user);
   } catch (error) {

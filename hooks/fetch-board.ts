@@ -1,7 +1,6 @@
 'use server';
 import prisma from '@/lib/prismadb';
 export const fetchBoard = async (boardId: string) => {
-  console.log(boardId);
   try {
     const board = await prisma.board.findFirst({
       where: {

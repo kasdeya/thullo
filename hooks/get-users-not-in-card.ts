@@ -29,6 +29,5 @@ export const getUsersNotInCard = async (card: Card) => {
       ],
     },
   });
-  console.log('ran', users);
   return users;
 };

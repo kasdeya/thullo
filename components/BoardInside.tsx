@@ -12,9 +12,11 @@ import { updateBoard } from '@/hooks/update-board-lists';
 import { useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { useModal } from '@/hooks/use-modal-store';
+import { useSession } from 'next-auth/react';
 
 const BoardInside = ({ board }: any) => {
   const { onOpen } = useModal();
+  const { data: session, status } = useSession();
   const handleOnDragEnd = async (result: DropResult) => {
     const { destination, source, type } = result;
 
@@ -25,6 +27,7 @@ const BoardInside = ({ board }: any) => {
       board.lists[destination.index].index = source.index;
       const [removed] = board.lists.splice(source.index, 1);
       board.lists.splice(destination?.index, 0, removed);
+      if (!session?.user?.email) return;
       updateBoard({
         listOne: board.lists[source.index],
         listTwo: board.lists[destination.index],
@@ -70,6 +73,7 @@ const BoardInside = ({ board }: any) => {
       }
     );
 
+    if (!session?.user?.email) return;
     updateBoard({
       listOne: board.lists[source.droppableId],
       listTwo: board.lists[destination.droppableId],
@@ -110,12 +114,14 @@ const BoardInside = ({ board }: any) => {
               {/* <Column /> */}
               {provided.placeholder}
 
-              <button
-                onClick={() => onOpen('createList')}
-                className="h-10 p-2 flex justify-between bg-[#DAE4FD] text-[#2F80ED] rounded-md  w-full font-bold">
-                Add a list
-                <Plus />
-              </button>
+              {session?.user?.email && (
+                <button
+                  onClick={() => onOpen('createList')}
+                  className="h-10 p-2 flex justify-between bg-[#DAE4FD] text-[#2F80ED] rounded-md  w-full font-bold">
+                  Add a list
+                  <Plus />
+                </button>
+              )}
             </div>
           )}
         </Droppable>

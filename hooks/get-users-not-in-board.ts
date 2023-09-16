@@ -17,6 +17,5 @@ export const getUsersNotInBoard = async ({
       },
     },
   });
-  console.log('ran', users);
   return users;
 };

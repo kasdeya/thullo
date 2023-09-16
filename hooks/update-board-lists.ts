@@ -2,6 +2,7 @@
 import prisma from '@/lib/prismadb';
 import { Board, Card, List } from '@prisma/client';
 import { ObjectId } from 'mongodb';
+import { getServerSession } from 'next-auth';
 export const updateBoard = async ({
   listOne,
   listTwo,
@@ -10,9 +11,9 @@ export const updateBoard = async ({
   startIndex,
   finishIndex,
 }: any) => {
-  // console.log('list one: ', listOne, 'list two: ', listTwo);
+  const session = await getServerSession();
+  if (!session?.user?.email) return;
 
-  ('use server');
   if (type === 'list') {
     await prisma.list.update({
       where: {
@@ -34,7 +35,6 @@ export const updateBoard = async ({
   }
 
   if (type === 'card') {
-    console.log('indexes:', startIndex, finishIndex);
     // id object for card probably wont need it
     const id = new ObjectId(movedCard.id);
     // If we dropping the card in same list(column)
