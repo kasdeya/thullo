@@ -12,19 +12,29 @@ import { PlusIcon } from 'lucide-react';
 import { Label } from './ui/label';
 import useBoardStore from '@/hooks/use-board-store';
 import { Attachment } from '@prisma/client';
+import { useRouter } from 'next/navigation';
+import { avatarImageUpload } from '@/hooks/avatar-image-upload';
 
-export function CustomUpload({ cardId, listId }: any) {
+export function CustomUpload({ endPoint, userId, cardId, listId }: any) {
   const [files, setFiles] = useState<File[]>([]);
   const { updateCardAttachments } = useBoardStore();
+  const router = useRouter();
 
   const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
     setFiles(acceptedFiles);
   }, []);
 
-  const { startUpload, permittedFileInfo } = useUploadThing('cardFile', {
+  const { startUpload, permittedFileInfo } = useUploadThing(endPoint, {
     onClientUploadComplete: async (res) => {
-      const prismaRes = await cardFileUpload(res, cardId);
-      updateCardAttachments(listId, cardId, prismaRes);
+      if (endPoint === 'cardFile') {
+        const prismaRes = await cardFileUpload(res, cardId);
+        updateCardAttachments(listId, cardId, prismaRes);
+      }
+      if (endPoint === 'avatarImage') {
+        const prismaRes = await avatarImageUpload(res, userId);
+        router.refresh();
+        // updateUserAvatar(userId, prismaRes)
+      }
       setFile(null);
       setUploading(false);
       //   alert('uploaded successfully!');

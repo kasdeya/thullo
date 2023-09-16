@@ -176,6 +176,7 @@ const CardModal = () => {
                   </Button> */}
                   {session?.user?.email && (
                     <CustomUpload
+                      endPoint="cardFile"
                       cardId={card.id}
                       listId={card.listId}
                     />

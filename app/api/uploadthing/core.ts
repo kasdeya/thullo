@@ -27,6 +27,10 @@ export const ourFileRouter = {
   cardFile: f(['image', 'pdf', 'video', 'audio', 'blob', 'text'])
     .middleware(() => handleAuth())
     .onUploadComplete(() => {}),
+
+  avatarImage: f({ image: { maxFileSize: '4MB', maxFileCount: 1 } })
+    .middleware(() => handleAuth())
+    .onUploadComplete(() => {}),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

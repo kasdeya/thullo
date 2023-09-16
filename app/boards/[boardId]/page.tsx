@@ -87,7 +87,7 @@ const BoardPage = ({ params }: any) => {
       </>
     );
   } else {
-    return <div>Loading...</div>;
+    return null;
   }
 };
 
