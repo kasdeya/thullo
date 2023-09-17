@@ -3,8 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { Fragment, useState } from 'react';
 import { Textarea } from './ui/textarea';
-import { editComment } from '@/hooks/edit-comment';
-import { deleteComment } from '@/hooks/delete-comment';
+import { editComment } from '@/lib/edit-comment';
+import { deleteComment } from '@/lib/delete-comment';
 
 const Comment = ({ comment }: any) => {
   const [edit, setEdit] = useState(false);

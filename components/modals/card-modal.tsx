@@ -17,7 +17,7 @@ import axios from 'axios';
 import AddCardMember from '../cards/AddCardMember';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Attachment, Card, User } from '@prisma/client';
-import { cardFileDelete } from '@/hooks/card-file-delete';
+import { cardFileDelete } from '@/lib/card-file-delete';
 import { CustomUpload } from '../CustomUpload';
 import useBoardStore from '@/hooks/use-board-store';
 import { CardWithAttachmentsAndMembers, CommentWithUser } from '@/types';
@@ -26,7 +26,7 @@ import AddCardLabels from '../cards/AddCardLabels';
 import CommentArea from '../CommentArea';
 import Comment from '../Comment';
 import { useSession } from 'next-auth/react';
-import { cardDelete } from '@/hooks/card-delete';
+import { cardDelete } from '@/lib/card-delete';
 
 const IMAGE_TYPES = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'];
 
@@ -132,24 +132,26 @@ const CardModal = () => {
             )}
           </div>
           <div className="grid grid-cols-[_1fr,_0.3fr] gap-4">
-            <div>
+            <div className="grid gap-4">
               <DialogTitle>
                 <p>{card?.name}</p>
-                <Label>
+                <span className="text-[14px]">
                   in list <b>{listName}</b>
-                </Label>
+                </span>
               </DialogTitle>
-              <Label>Description</Label>{' '}
-              {session?.user?.email && (
-                <Button
-                  className="!h-[24px] !w-[65px]"
-                  onClick={() => setEditDescription(true)}>
-                  <p className="flex flex-row place-items-center gap-1">
-                    <PencilIcon size={15} />
-                    Edit
-                  </p>
-                </Button>
-              )}
+              <div className="flex flex-row gap-2">
+                <span className="text-[14px]">Description</span>{' '}
+                {session?.user?.email && (
+                  <Button
+                    className="!h-[24px] !w-[65px]"
+                    onClick={() => setEditDescription(true)}>
+                    <p className="flex flex-row place-items-center gap-1">
+                      <PencilIcon size={15} />
+                      Edit
+                    </p>
+                  </Button>
+                )}
+              </div>
               <DialogDescription>
                 {editDescription
                   ? null

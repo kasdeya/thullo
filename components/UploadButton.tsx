@@ -7,7 +7,7 @@ import { UploadDropzone, UploadButton } from '@/lib/uploadthing';
 
 import '@uploadthing/react/styles.css';
 import '@/lib/prismadb';
-import { cardFileUpload } from '@/hooks/card-file-upload';
+import { cardFileUpload } from '@/lib/card-file-upload';
 
 interface FileUploadProps {
   onChange: (url?: string) => void;

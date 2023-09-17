@@ -8,7 +8,7 @@ import prisma from '@/lib/prismadb';
 import { useEffect, useState } from 'react';
 import { Board, User } from '@prisma/client';
 import { BoardWithUsersAndListsWithCards } from '@/types';
-import { getUsersNotInBoard } from '@/hooks/get-users-not-in-board';
+import { getUsersNotInBoard } from '@/lib/get-users-not-in-board';
 import { ScrollArea } from '../ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import axios from 'axios';
@@ -116,8 +116,7 @@ const AddBoardMember = ({ board }: BoardWithUsersAndListsWithCards) => {
                           className={`flex flex-row gap-2 place-items-center p-2 hover:bg-white/10 cursor-pointer w-full ${
                             userSelected(member.id) ? 'bg-white/10' : ''
                           }`}
-                          key={member.id}
-                        >
+                          key={member.id}>
                           <Avatar>
                             {member.profileImage ? (
                               <AvatarImage src={member.profileImage} />
@@ -145,8 +144,7 @@ const AddBoardMember = ({ board }: BoardWithUsersAndListsWithCards) => {
                         className={`flex flex-row gap-2 place-items-center p-2 hover:bg-white/10 cursor-pointer ${
                           userSelected(member.id) ? 'bg-white/10' : ''
                         }`}
-                        key={member.id}
-                      >
+                        key={member.id}>
                         <Avatar>
                           {member.profileImage ? (
                             <AvatarImage src={member.profileImage} />

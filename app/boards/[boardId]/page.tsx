@@ -63,6 +63,7 @@ const BoardPage = ({ params }: any) => {
         const { data } = await axios.get(`/api/boards/${boardId}`);
         const board = data;
         setBoard(board);
+        console.log('setboard:', board);
       } catch (error) {
         console.log(error);
       }

@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react';
 import { Button } from './ui/button';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { useEffect, useState } from 'react';
-import { deleteList } from '@/hooks/remove-list';
+import { deleteList } from '@/lib/remove-list';
 
 const Column = ({ id, name, cards, index, board }: any) => {
   const { onOpen } = useModal();

@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import useBoardStore from '@/hooks/use-board-store';
-import { addCommentPrisma } from '@/hooks/add-comment-prisma';
+import { addCommentPrisma } from '@/lib/add-comment-prisma';
 import { Comment } from '@prisma/client';
 
 interface CommentAreaProps {

@@ -9,9 +9,9 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from './ui/button';
 import { ImageIcon, SearchIcon } from 'lucide-react';
-import { fetchImages } from '@/hooks/fetch-images';
+import { fetchImages } from '@/lib/fetch-images';
 import useBoardStore from '@/hooks/use-board-store';
-import { updateDbCardCover } from '@/hooks/update-db-card-cover';
+import { updateDbCardCover } from '@/lib/update-db-card-cover';
 interface UnsplashProps {
   cardId: string;
   listId: string;

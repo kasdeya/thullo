@@ -8,7 +8,7 @@ import {
 } from '@hello-pangea/dnd';
 import Column from './Column';
 import prisma from '@/lib/prismadb';
-import { updateBoard } from '@/hooks/update-board-lists';
+import { updateBoard } from '@/lib/update-board-lists';
 import { useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { useModal } from '@/hooks/use-modal-store';

@@ -6,14 +6,14 @@ import { generateClientDropzoneAccept } from 'uploadthing/client';
 
 import { useUploadThing } from '@/hooks/uploadthing';
 import { useCallback, useState } from 'react';
-import { cardFileUpload } from '@/hooks/card-file-upload';
+import { cardFileUpload } from '@/lib/card-file-upload';
 import { Button, buttonVariants } from './ui/button';
 import { PlusIcon } from 'lucide-react';
 import { Label } from './ui/label';
 import useBoardStore from '@/hooks/use-board-store';
 import { Attachment } from '@prisma/client';
 import { useRouter } from 'next/navigation';
-import { avatarImageUpload } from '@/hooks/avatar-image-upload';
+import { avatarImageUpload } from '@/lib/avatar-image-upload';
 
 export function CustomUpload({ endPoint, userId, cardId, listId }: any) {
   const [files, setFiles] = useState<File[]>([]);

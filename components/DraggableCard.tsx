@@ -14,8 +14,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Board, Comment, Label, User } from '@prisma/client';
 import prisma from '@/lib/prismadb';
-import { getCardMembers } from '@/hooks/get-card-members';
-import { getCardOwner } from '@/hooks/get-card-owner';
+import { getCardMembers } from '@/lib/get-card-members';
+import { getCardOwner } from '@/lib/get-card-owner';
 import { useEffect, useState } from 'react';
 import { useModal } from '@/hooks/use-modal-store';
 import { CardWithAttachments, CardWithAttachmentsAndMembers } from '@/types';

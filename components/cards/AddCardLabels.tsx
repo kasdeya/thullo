@@ -7,11 +7,11 @@ import { Input } from '../ui/input';
 import { Tag, TagIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../ui/button';
-import { createLabel } from '@/hooks/create-label';
+import { createLabel } from '@/lib/create-label';
 import useBoardStore from '@/hooks/use-board-store';
 import { Label } from '@prisma/client';
 import LabelBadge from '../LabelBadge';
-import { addCardLabelPrisma } from '@/hooks/add-card-label-prisma';
+import { addCardLabelPrisma } from '@/lib/add-card-label-prisma';
 
 interface AddCardLabelsProps {
   cardId: string;
