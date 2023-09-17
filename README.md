@@ -9,7 +9,7 @@
 
 ![screenshot](./public/preview.gif)
 
-<a href="httos://thullo-two.vercel.app/" target="_blank">Live Demo</a>
+[Live Demo](https://thullo-two.vercel.app/)
 
 ### Built With
 
