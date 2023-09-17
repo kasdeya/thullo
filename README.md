@@ -7,7 +7,7 @@
 
 ## Overview
 
-![screenshot](./public/screenshot.png)
+![screenshot](./public/preview.gif)
 
 [Live Demo](https://thullo-two.vercel.app/)
 
