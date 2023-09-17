@@ -12,7 +12,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     // Redirect to '/boards' when the component mounts
-    router.push('/boards');
+    router.replace('/boards');
   }, [router]);
 };
 
